@@ -42,7 +42,7 @@ export default function AddDoctorForm() {
       onSubmit={handleAdd}
       className="bg-white p-8 rounded-lg shadow-lg max-w-lg"
     >
-      <h3 className="text-2xl font-bold mb-6">
+      <h3 className="text-2xl text-black font-bold mb-6">
         Add New Doctor (Pending Approval)
       </h3>
       <input
