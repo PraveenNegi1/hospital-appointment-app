@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
 import { format } from "date-fns";
-import { Timestamp } from "firebase/firestore"; // Import Timestamp
+import { Timestamp } from "firebase/firestore";
 import {
   Calendar,
   Clock,
@@ -22,12 +22,14 @@ import {
   Mail,
   Stethoscope,
   XCircle,
+  CheckSquare,
 } from "lucide-react";
 
 export default function DoctorDashboard() {
   const [appointments, setAppointments] = useState([]);
   const [confirmingId, setConfirmingId] = useState(null);
   const [cancellingId, setCancellingId] = useState(null);
+  const [completingId, setCompletingId] = useState(null);
   const [doctorName, setDoctorName] = useState("Doctor");
 
   useEffect(() => {
@@ -36,8 +38,6 @@ export default function DoctorDashboard() {
         setDoctorName(
           user.displayName || user.email?.split("@")[0] || "Doctor"
         );
-      } else {
-        setDoctorName("Doctor");
       }
     });
     return () => unsubscribeAuth();
@@ -53,78 +53,111 @@ export default function DoctorDashboard() {
 
     const unsub = onSnapshot(q, (snap) => {
       const apps = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      apps.sort((a, b) => {
-        const dateA = getDateObject(a.date);
-        const dateB = getDateObject(b.date);
-        return dateB - dateA; // Latest first
-      });
+      apps.sort((a, b) => getDateObject(b.date) - getDateObject(a.date));
       setAppointments(apps);
     });
 
     return unsub;
   }, []);
 
-  // Helper to safely convert date (string or Timestamp) to Date object
   const getDateObject = (dateField) => {
     if (!dateField) return new Date(0);
-    if (dateField instanceof Timestamp) {
-      return dateField.toDate();
-    }
+    if (dateField instanceof Timestamp) return dateField.toDate();
     return new Date(dateField);
   };
 
-  // Helper to format date safely
-  const formatDate = (dateField) => {
-    const date = getDateObject(dateField);
-    return isNaN(date.getTime()) ? "Invalid Date" : format(date, "PPP");
-  };
+  const confirmAppointment = async (appointment) => {
+    if (
+      !confirm(
+        `Confirm appointment with ${
+          appointment.patientName || "patient"
+        } on ${format(getDateObject(appointment.date), "PPP")} at ${
+          appointment.time || "any time"
+        }?`
+      )
+    ) {
+      return;
+    }
 
-  const confirmAppointment = async (appointmentId) => {
-    if (!confirm("Confirm this appointment?")) return;
-
-    setConfirmingId(appointmentId);
+    setConfirmingId(appointment.id);
     try {
-      await updateDoc(doc(db, "appointments", appointmentId), {
+      await updateDoc(doc(db, "appointments", appointment.id), {
         status: "confirmed",
         confirmedAt: new Date(),
       });
-      alert("Appointment confirmed successfully!");
+      alert("Appointment confirmed!");
     } catch (error) {
-      console.error("Error:", error);
+      console.error(error);
       alert("Failed to confirm.");
     } finally {
       setConfirmingId(null);
     }
   };
 
-  const cancelAppointment = async (appointmentId) => {
-    if (!confirm("Cancel this appointment? This cannot be undone.")) return;
+  const cancelAppointment = async (appointment) => {
+    if (
+      !confirm(
+        `Cancel this appointment with ${appointment.patientName || "patient"}?`
+      )
+    )
+      return;
 
-    setCancellingId(appointmentId);
+    setCancellingId(appointment.id);
     try {
-      await updateDoc(doc(db, "appointments", appointmentId), {
+      await updateDoc(doc(db, "appointments", appointment.id), {
         status: "cancelled",
         cancelledAt: new Date(),
       });
-      alert("Appointment cancelled successfully.");
+      alert("Appointment cancelled.");
     } catch (error) {
-      console.error("Error cancelling:", error);
+      console.error(error);
       alert("Failed to cancel.");
     } finally {
       setCancellingId(null);
     }
   };
 
+  const completeAppointment = async (appointment) => {
+    if (!confirm(`Mark appointment as completed?`)) return;
+
+    setCompletingId(appointment.id);
+    try {
+      await updateDoc(doc(db, "appointments", appointment.id), {
+        status: "completed",
+        completedAt: new Date(),
+      });
+      alert("Marked as completed.");
+    } catch (error) {
+      console.error(error);
+      alert("Failed.");
+    } finally {
+      setCompletingId(null);
+    }
+  };
+
   const getStatusBadge = (status) => {
     switch (status?.toLowerCase()) {
       case "confirmed":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-green-100 text-green-800 border-2 border-green-300";
       case "completed":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-blue-100 text-blue-800 border-2 border-blue-300";
       case "cancelled":
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-red-100 text-red-800 border-2 border-red-300";
       default:
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-yellow-100 text-yellow-800 border-2 border-yellow-300";
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status?.toLowerCase()) {
+      case "confirmed":
+        return "Confirmed";
+      case "completed":
+        return "Completed";
+      case "cancelled":
+        return "Cancelled";
+      default:
+        return "Pending";
     }
   };
 
@@ -146,10 +179,7 @@ export default function DoctorDashboard() {
           <div className="text-center py-20 bg-white rounded-3xl shadow-lg">
             <Calendar className="w-20 h-20 text-gray-300 mx-auto mb-6" />
             <p className="text-2xl text-gray-600 font-medium">
-              No appointments scheduled yet.
-            </p>
-            <p className="text-gray-500 mt-3">
-              Patients will appear here once they book with you.
+              No appointments yet.
             </p>
           </div>
         ) : (
@@ -157,119 +187,101 @@ export default function DoctorDashboard() {
             {appointments.map((app) => (
               <div
                 key={app.id}
-                className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden"
+                className="bg-white rounded-3xl shadow-lg p-8 border border-gray-100"
               >
-                <div className="p-8">
-                  <div className="flex justify-between items-start mb-6">
-                    <div>
-                      <div className="flex items-center gap-4 mb-3">
-                        <User className="w-8 h-8 text-green-600" />
-                        <h3 className="text-2xl font-bold text-gray-900">
-                          {app.patientName || "Unknown Patient"}
-                        </h3>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
-                        {app.patientEmail && (
-                          <div className="flex items-center gap-3">
-                            <Mail className="w-5 h-5 text-blue-600" />
-                            <span>{app.patientEmail}</span>
-                          </div>
-                        )}
-                        {app.patientPhone && (
-                          <div className="flex items-center gap-3">
-                            <Phone className="w-5 h-5 text-purple-600" />
-                            <span>{app.patientPhone}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <span
-                      className={`px-5 py-2 rounded-full text-sm font-bold border ${getStatusBadge(
-                        app.status
-                      )}`}
-                    >
-                      {app.status
-                        ? app.status.charAt(0).toUpperCase() +
-                          app.status.slice(1)
-                        : "Pending"}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 text-gray-700">
-                    <div className="flex items-center gap-4">
-                      <Calendar className="w-6 h-6 text-green-600" />
-                      <div>
-                        <p className="text-sm text-gray-500">Date</p>
-                        <p className="font-semibold text-lg">
-                          {app.date ? formatDate(app.date) : "Not set"}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <Clock className="w-6 h-6 text-blue-600" />
-                      <div>
-                        <p className="text-sm text-gray-500">Time</p>
-                        <p className="font-semibold text-lg">
-                          {app.time || "Not set"}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <AlertCircle className="w-6 h-6 text-orange-600" />
-                      <div>
-                        <p className="text-sm text-gray-500">Reason</p>
-                        <p className="font-semibold text-lg">
-                          {app.reason || "General Checkup"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-4">
-                    {/* Confirm Button */}
-                    {(app.status === "pending" || !app.status) && (
-                      <button
-                        onClick={() => confirmAppointment(app.id)}
-                        disabled={confirmingId === app.id}
-                        className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg hover:shadow-xl disabled:opacity-70"
-                      >
-                        <CheckCircle className="w-6 h-6" />
-                        {confirmingId === app.id ? "Confirming..." : "Confirm"}
-                      </button>
-                    )}
-
-                    {/* Cancel Button - Show for pending or confirmed */}
-                    {app.status !== "cancelled" &&
-                      app.status !== "completed" && (
-                        <button
-                          onClick={() => cancelAppointment(app.id)}
-                          disabled={cancellingId === app.id}
-                          className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg hover:shadow-xl disabled:opacity-70"
-                        >
-                          <XCircle className="w-6 h-6" />
-                          {cancellingId === app.id ? "Cancelling..." : "Cancel"}
-                        </button>
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h3 className="text-2xl font-bold flex items-center gap-3">
+                      <User className="w-8 h-8 text-green-600" />
+                      {app.patientName || "Unknown Patient"}
+                    </h3>
+                    <div className="mt-3 space-y-2 text-gray-700">
+                      {app.patientEmail && (
+                        <div className="flex items-center gap-2">
+                          <Mail className="w-5 h-5" /> {app.patientEmail}
+                        </div>
                       )}
-                  </div>
-
-                  {/* Status Messages */}
-                  {app.status === "confirmed" && app.status !== "pending" && (
-                    <div className="mt-6 text-center text-green-700 font-semibold text-lg">
-                      <CheckCircle className="w-8 h-8 inline-block mr-2" />
-                      Appointment Confirmed
+                      {app.patientPhone && (
+                        <div className="flex items-center gap-2">
+                          <Phone className="w-5 h-5" /> {app.patientPhone}
+                        </div>
+                      )}
                     </div>
+                  </div>
+                  <span
+                    className={`px-6 py-3 rounded-full font-bold text-lg ${getStatusBadge(
+                      app.status
+                    )}`}
+                  >
+                    {getStatusText(app.status)}
+                  </span>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-6 mb-8">
+                  <div className="flex gap-3">
+                    <Calendar className="w-6 h-6 text-green-600" />{" "}
+                    <div>
+                      <p className="text-sm text-gray-500">Date</p>
+                      <p className="font-semibold">
+                        {format(getDateObject(app.date), "PPP")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <Clock className="w-6 h-6 text-blue-600" />{" "}
+                    <div>
+                      <p className="text-sm text-gray-500">Time</p>
+                      <p className="font-semibold">{app.time || "Not set"}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <AlertCircle className="w-6 h-6 text-orange-600" />{" "}
+                    <div>
+                      <p className="text-sm text-gray-500">Reason</p>
+                      <p className="font-semibold">{app.reason || "Checkup"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* CONFIRM BUTTON - Only if pending */}
+                  {(app.status === "pending" || !app.status) && (
+                    <button
+                      onClick={() => confirmAppointment(app)}
+                      disabled={confirmingId === app.id}
+                      className="bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl flex items-center justify-center gap-2 disabled:opacity-70"
+                    >
+                      <CheckCircle className="w-6 h-6" />
+                      {confirmingId === app.id
+                        ? "Confirming..."
+                        : "Confirm Appointment"}
+                    </button>
                   )}
 
-                  {app.status === "cancelled" && (
-                    <div className="mt-6 text-center text-red-700 font-semibold text-lg">
-                      <XCircle className="w-8 h-8 inline-block mr-2" />
-                      Appointment Cancelled
-                    </div>
+                  {/* MARK COMPLETED - Only if confirmed */}
+                  {app.status === "confirmed" && (
+                    <button
+                      onClick={() => completeAppointment(app)}
+                      disabled={completingId === app.id}
+                      className="bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl flex items-center justify-center gap-2"
+                    >
+                      <CheckSquare className="w-6 h-6" />
+                      Mark as Completed
+                    </button>
+                  )}
+
+                  {/* CANCEL BUTTON - If not already cancelled/completed */}
+                  {app.status !== "cancelled" && app.status !== "completed" && (
+                    <button
+                      onClick={() => cancelAppointment(app)}
+                      disabled={cancellingId === app.id}
+                      className="bg-red-600 hover:bg-red-700 text-white py-4 rounded-xl flex items-center justify-center gap-2 disabled:opacity-70"
+                    >
+                      <XCircle className="w-6 h-6" />
+                      {cancellingId === app.id
+                        ? "Cancelling..."
+                        : "Cancel Appointment"}
+                    </button>
                   )}
                 </div>
               </div>

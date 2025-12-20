@@ -10,10 +10,9 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
-import DoctorCard from "@/components/DoctorCard";
 import BookingModal from "@/components/BookingModal";
 import { format } from "date-fns";
-import { Timestamp } from "firebase/firestore"; // Add this import
+import { Timestamp } from "firebase/firestore";
 import {
   Calendar,
   Clock,
@@ -22,6 +21,11 @@ import {
   XCircle,
   AlertCircle,
   CheckCircle,
+  MapPin,
+  Phone,
+  IndianRupee,
+  GraduationCap,
+  Briefcase,
 } from "lucide-react";
 
 export default function PatientDashboard() {
@@ -39,8 +43,7 @@ export default function PatientDashboard() {
       query(collection(db, "doctors"), where("approved", "==", true)),
       (snap) => {
         setDoctors(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-      },
-      (error) => console.error("Error fetching doctors:", error)
+      }
     );
 
     // Fetch patient's appointments
@@ -49,22 +52,17 @@ export default function PatientDashboard() {
       where("patientId", "==", auth.currentUser.uid)
     );
 
-    const unsubApps = onSnapshot(
-      q,
-      (snap) => {
-        const apps = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const unsubApps = onSnapshot(q, (snap) => {
+      const apps = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-        // Sort by date/time (newest first)
-        apps.sort((a, b) => {
-          const dateA = getDateObject(a.date);
-          const dateB = getDateObject(b.date);
-          return dateB - dateA;
-        });
+      apps.sort((a, b) => {
+        const dateA = getDateObject(a.date);
+        const dateB = getDateObject(b.date);
+        return dateB - dateA; // Latest first
+      });
 
-        setAppointments(apps);
-      },
-      (error) => console.error("Error fetching appointments:", error)
-    );
+      setAppointments(apps);
+    });
 
     return () => {
       unsubDoctors();
@@ -72,24 +70,24 @@ export default function PatientDashboard() {
     };
   }, []);
 
-  // Helper: Convert Firestore Timestamp or string to Date object
   const getDateObject = (dateField) => {
     if (!dateField) return new Date(0);
-    if (dateField instanceof Timestamp) {
-      return dateField.toDate();
-    }
-    // If it's a string like "2025-12-25"
+    if (dateField instanceof Timestamp) return dateField.toDate();
     return new Date(dateField);
   };
 
-  // Helper: Safely format date
   const formatAppointmentDate = (dateField) => {
     const date = getDateObject(dateField);
     return isNaN(date.getTime()) ? "Invalid Date" : format(date, "PPP");
   };
 
   const cancelAppointment = async (appointmentId) => {
-    if (!confirm("Are you sure you want to cancel this appointment?")) return;
+    if (
+      !confirm(
+        "Are you sure you want to cancel this appointment? This cannot be undone."
+      )
+    )
+      return;
 
     setCancellingId(appointmentId);
     try {
@@ -99,8 +97,8 @@ export default function PatientDashboard() {
       });
       alert("Appointment cancelled successfully.");
     } catch (error) {
-      console.error("Error cancelling appointment:", error);
-      alert("Failed to cancel appointment. Please try again.");
+      console.error("Error:", error);
+      alert("Failed to cancel.");
     } finally {
       setCancellingId(null);
     }
@@ -133,7 +131,7 @@ export default function PatientDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-white py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Tabs */}
         <div className="flex gap-10 border-b-2 border-gray-200 mb-12">
@@ -181,17 +179,157 @@ export default function PatientDashboard() {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {doctors.map((doctor) => (
-                  <DoctorCard
+                  <div
                     key={doctor.id}
-                    doctor={doctor}
-                    onBook={() => setSelectedDoctor(doctor)}
-                  />
+                    className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col"
+                  >
+                    {/* Doctor Photo & Header */}
+                    <div className="relative h-64 bg-gradient-to-b from-blue-100 to-blue-200">
+                      {doctor.photoURL ? (
+                        <img
+                          src={doctor.photoURL}
+                          alt={`Dr. ${doctor.name}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                            e.target.nextSibling.style.display = "flex";
+                          }}
+                        />
+                      ) : null}
+                      <div
+                        className={`absolute inset-0 flex items-center justify-center ${
+                          doctor.photoURL ? "hidden" : "flex"
+                        }`}
+                      >
+                        <User className="w-32 h-32 text-blue-600 opacity-50" />
+                      </div>
+
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                        <h3 className="text-2xl font-bold text-white">
+                          Dr. {doctor.name}
+                        </h3>
+                        <p className="text-lg text-white/90">
+                          {doctor.specialty}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Doctor Details */}
+                    <div className="p-6 space-y-4 flex-1">
+                      {doctor.qualifications && (
+                        <div className="flex items-center gap-3">
+                          <GraduationCap className="w-6 h-6 text-purple-600" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">
+                              Qualifications
+                            </p>
+                            <p className="text-base font-semibold text-gray-800">
+                              {doctor.qualifications}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {doctor.experience > 0 && (
+                        <div className="flex items-center gap-3">
+                          <Briefcase className="w-6 h-6 text-green-600" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">
+                              Experience
+                            </p>
+                            <p className="text-base font-semibold text-gray-800">
+                              {doctor.experience} years
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {doctor.clinicName && (
+                        <div className="flex items-center gap-3">
+                          <Stethoscope className="w-6 h-6 text-blue-600" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">
+                              Clinic
+                            </p>
+                            <p className="text-base font-semibold text-gray-800">
+                              {doctor.clinicName}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {doctor.address && (
+                        <div className="flex items-start gap-3">
+                          <MapPin className="w-6 h-6 text-orange-600 mt-0.5" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">
+                              Address
+                            </p>
+                            <p className="text-base text-gray-700">
+                              {doctor.address}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {doctor.phone && (
+                        <div className="flex items-center gap-3">
+                          <Phone className="w-6 h-6 text-indigo-600" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">
+                              Phone
+                            </p>
+                            <p className="text-base font-semibold text-gray-800">
+                              {doctor.phone}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {doctor.fee > 0 && (
+                        <div className="flex items-center gap-3">
+                          <IndianRupee className="w-6 h-6 text-green-600" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">
+                              Consultation Fee
+                            </p>
+                            <p className="text-lg font-bold text-green-700">
+                              ₹{doctor.fee}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {doctor.bio && (
+                        <div>
+                          <p className="text-sm font-medium text-gray-500 mb-1">
+                            About
+                          </p>
+                          <p className="text-base text-gray-700 line-clamp-3">
+                            {doctor.bio}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Book Button */}
+                    <div className="p-6 pt-0">
+                      <button
+                        onClick={() => setSelectedDoctor(doctor)}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-md flex items-center justify-center gap-2"
+                      >
+                        <Calendar className="w-5 h-5" />
+                        Book Appointment
+                      </button>
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
 
+            {/* Booking Modal */}
             {selectedDoctor && (
               <BookingModal
                 doctor={selectedDoctor}
@@ -201,7 +339,7 @@ export default function PatientDashboard() {
           </div>
         )}
 
-        {/* Appointment History Tab */}
+        {/* My Appointments Tab */}
         {activeTab === "history" && (
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-10 flex items-center gap-4">
@@ -213,10 +351,10 @@ export default function PatientDashboard() {
               <div className="text-center py-24 bg-white rounded-3xl shadow-2xl">
                 <AlertCircle className="w-24 h-24 text-gray-300 mx-auto mb-6" />
                 <p className="text-2xl text-gray-600 font-semibold">
-                  No appointments booked yet.
+                  No appointments yet.
                 </p>
                 <p className="text-gray-500 mt-3 text-lg">
-                  Switch to "Book Appointment" to schedule your first visit!
+                  Book your first appointment!
                 </p>
               </div>
             ) : (
@@ -224,7 +362,7 @@ export default function PatientDashboard() {
                 {appointments.map((app) => (
                   <div
                     key={app.id}
-                    className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden"
+                    className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100"
                   >
                     <div className="p-8">
                       <div className="flex justify-between items-start mb-6">
@@ -232,7 +370,7 @@ export default function PatientDashboard() {
                           <div className="flex items-center gap-4 mb-2">
                             <User className="w-8 h-8 text-blue-600" />
                             <h3 className="text-2xl font-bold text-gray-900">
-                              Dr. {app.doctorName || "Unknown Doctor"}
+                              Dr. {app.doctorName}
                             </h3>
                           </div>
                           <p className="text-lg text-gray-600 flex items-center gap-3">
@@ -263,13 +401,10 @@ export default function PatientDashboard() {
                               Date
                             </p>
                             <p className="text-lg font-semibold">
-                              {app.date
-                                ? formatAppointmentDate(app.date)
-                                : "Not set"}
+                              {formatAppointmentDate(app.date)}
                             </p>
                           </div>
                         </div>
-
                         <div className="flex items-center gap-4">
                           <Clock className="w-7 h-7 text-blue-600" />
                           <div>
@@ -277,13 +412,10 @@ export default function PatientDashboard() {
                               Time
                             </p>
                             <p className="text-lg font-semibold">
-                              {app.time && app.time.trim() !== ""
-                                ? app.time
-                                : "Not set"}
+                              {app.time || "Not set"}
                             </p>
                           </div>
                         </div>
-
                         <div className="flex items-center gap-4">
                           <AlertCircle className="w-7 h-7 text-orange-600" />
                           <div>
@@ -297,8 +429,10 @@ export default function PatientDashboard() {
                         </div>
                       </div>
 
-                      {/* Cancel Button - Only if not cancelled/completed and future date */}
-                      {app.status !== "cancelled" &&
+                      {(app.status === "pending" ||
+                        !app.status ||
+                        app.status === "confirmed") &&
+                        app.status !== "cancelled" &&
                         app.status !== "completed" &&
                         getDateObject(app.date) > new Date() && (
                           <button
@@ -316,7 +450,7 @@ export default function PatientDashboard() {
                       {app.status === "cancelled" && (
                         <p className="text-center text-red-700 font-semibold text-lg mt-4">
                           <XCircle className="w-8 h-8 inline-block mr-3" />
-                          This appointment has been cancelled.
+                          Appointment Cancelled
                         </p>
                       )}
                     </div>
