@@ -21,7 +21,6 @@ export default function AddDoctorForm() {
 
   const [loading, setLoading] = useState(false);
 
-  // Generate default available slots for next 14 days
   const generateDefaultSlots = () => {
     const slots = {};
     const today = new Date();
