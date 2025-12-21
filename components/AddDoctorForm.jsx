@@ -24,12 +24,12 @@ export default function AddDoctorForm() {
   const generateDefaultSlots = () => {
     const slots = {};
     const today = new Date();
-    const timeSlots = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"]; // Customize as needed
+    const timeSlots = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"]; 
 
     for (let i = 1; i <= 14; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
-      const dateStr = date.toISOString().split("T")[0]; // YYYY-MM-DD
+      const dateStr = date.toISOString().split("T")[0]; 
       slots[dateStr] = timeSlots;
     }
     return slots;
@@ -74,7 +74,6 @@ export default function AddDoctorForm() {
         "Doctor profile submitted successfully! Waiting for admin approval."
       );
 
-      // Reset form
       setFormData({
         name: "",
         specialty: "",
@@ -195,7 +194,6 @@ export default function AddDoctorForm() {
             />
           </div>
 
-          {/* Consultation Fee */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Consultation Fee (₹)
@@ -211,7 +209,6 @@ export default function AddDoctorForm() {
             />
           </div>
 
-          {/* Experience */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Years of Experience
