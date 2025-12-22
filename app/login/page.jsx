@@ -71,10 +71,8 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-blue-500 via-purple-500 to-pink-500 flex items-center justify-center px-4">
-      {/* Background Overlay */}
       <div className="absolute inset-0 bg-black opacity-20"></div>
 
-      {/* Login Card */}
       <div className="relative w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 hover:scale-[1.02]">
           {/* Header */}
@@ -85,7 +83,6 @@ export default function Login() {
             </p>
           </div>
 
-          {/* Form */}
           <div className="p-8">
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
@@ -159,7 +156,6 @@ export default function Login() {
               </button>
             </form>
 
-            {/* Footer */}
             <div className="mt-8 text-center">
               <p className="text-gray-600">
                 Don't have an account?{" "}
