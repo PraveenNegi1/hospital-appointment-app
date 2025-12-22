@@ -164,7 +164,6 @@ export default function PatientDashboard() {
           </button>
         </div>
 
-        {/* Book Appointment Tab */}
         {activeTab === "book" && (
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-10 flex items-center gap-4">
@@ -185,7 +184,6 @@ export default function PatientDashboard() {
                     key={doctor.id}
                     className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col"
                   >
-                    {/* Doctor Photo & Header */}
                     <div className="relative h-64 ">
                       {doctor.photoURL ? (
                         <img
