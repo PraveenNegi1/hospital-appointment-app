@@ -27,21 +27,19 @@ export default function Login() {
       );
       const user = userCredential.user;
 
-      // Step 2: Fetch user role from Firestore
       const userDocRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userDocRef);
 
       if (!userDoc.exists()) {
         setError("User profile not found. Contact admin.");
-        await auth.signOut(); // Optional: sign out if no profile
+        await auth.signOut(); 
         setLoading(false);
         return;
       }
 
       const userData = userDoc.data();
-      const role = userData.role?.toLowerCase(); // e.g., "admin", "doctor", "patient"
+      const role = userData.role?.toLowerCase(); 
 
-      // Step 3: Redirect based on role
       if (role === "admin") {
         router.push("/dashboard/admin");
       } else if (role === "doctor") {
@@ -75,7 +73,6 @@ export default function Login() {
 
       <div className="relative w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 hover:scale-[1.02]">
-          {/* Header */}
           <div className="bg-blue-600 to-purple-600 p-8 text-center">
             <h1 className="text-4xl font-bold text-white mb-2">Welcome Back</h1>
             <p className="text-blue-100 text-lg">
@@ -170,7 +167,6 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Decorative Elements */}
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-pink-400 rounded-full opacity-20 blur-3xl"></div>
         <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-400 rounded-full opacity-20 blur-3xl"></div>
       </div>
