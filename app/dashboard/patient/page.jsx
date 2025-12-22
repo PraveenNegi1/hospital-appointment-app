@@ -38,7 +38,6 @@ export default function PatientDashboard() {
   useEffect(() => {
     if (!auth.currentUser) return;
 
-    // Fetch approved doctors
     const unsubDoctors = onSnapshot(
       query(collection(db, "doctors"), where("approved", "==", true)),
       (snap) => {
@@ -46,7 +45,6 @@ export default function PatientDashboard() {
       }
     );
 
-    // Fetch patient's appointments
     const q = query(
       collection(db, "appointments"),
       where("patientId", "==", auth.currentUser.uid)
@@ -327,7 +325,6 @@ export default function PatientDashboard() {
               </div>
             )}
 
-            {/* Booking Modal */}
             {selectedDoctor && (
               <BookingModal
                 doctor={selectedDoctor}
@@ -337,7 +334,6 @@ export default function PatientDashboard() {
           </div>
         )}
 
-        {/* My Appointments Tab */}
         {activeTab === "history" && (
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-10 flex items-center gap-4">
