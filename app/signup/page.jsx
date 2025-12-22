@@ -65,13 +65,10 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen bg-blue-500 via-purple-500 to-pink-500 flex items-center justify-center px-4">
-      {/* Background Overlay */}
       <div className="absolute inset-0 bg-black opacity-20"></div>
 
-      {/* Signup Card */}
       <div className="relative w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 hover:scale-[1.02]">
-          {/* Header */}
           <div className="bg-blue-600 to-purple-600 p-8 text-center">
             <h1 className="text-4xl font-bold text-white mb-2">
               Create Account
