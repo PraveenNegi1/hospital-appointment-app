@@ -78,7 +78,6 @@ export default function Signup() {
             </p>
           </div>
 
-          {/* Form */}
           <div className="p-8">
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
