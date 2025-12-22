@@ -19,7 +19,6 @@ export default function Login() {
     setError("");
 
     try {
-      // Step 1: Sign in with email/password
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
