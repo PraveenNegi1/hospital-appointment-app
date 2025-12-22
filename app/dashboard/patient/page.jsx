@@ -186,7 +186,7 @@ export default function PatientDashboard() {
                     className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col"
                   >
                     {/* Doctor Photo & Header */}
-                    <div className="relative h-64 bg-gradient-to-b from-blue-100 to-blue-200">
+                    <div className="relative h-64 ">
                       {doctor.photoURL ? (
                         <img
                           src={doctor.photoURL}
@@ -206,7 +206,7 @@ export default function PatientDashboard() {
                         <User className="w-32 h-32 text-blue-600 opacity-50" />
                       </div>
 
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                      <div className="absolute bottom-0 left-0 right-0  p-6">
                         <h3 className="text-2xl font-bold text-white">
                           Dr. {doctor.name}
                         </h3>
