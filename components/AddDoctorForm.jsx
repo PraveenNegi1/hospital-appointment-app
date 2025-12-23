@@ -256,7 +256,6 @@ export default function AddDoctorForm() {
           />
         </div>
 
-        {/* Bio */}
         <div className="mt-6">
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             Bio / About Doctor
