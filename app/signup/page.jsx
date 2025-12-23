@@ -183,7 +183,6 @@ export default function Signup() {
               </button>
             </form>
 
-            {/* Footer */}
             <div className="mt-8 text-center">
               <p className="text-gray-600">
                 Already have an account?{" "}
