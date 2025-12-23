@@ -271,7 +271,6 @@ export default function AddDoctorForm() {
           />
         </div>
 
-        {/* Photo URL */}
         <div className="mt-6">
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             Profile Photo URL (optional)
