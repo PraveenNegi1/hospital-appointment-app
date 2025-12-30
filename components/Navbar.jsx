@@ -21,13 +21,13 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-blue-600 text-white p-4">
+    <nav className="bg-white text-teal-600 p-4">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold">HospitalApp</Link>
         <div className="space-x-4">
           {user ? (
             <>
-              <button onClick={handleLogout} className="bg-red-500 px-4 py-2 rounded">Logout</button>
+              <button onClick={handleLogout} className="bg-white cursor-pointer  text-red-600 border border-red-600 hover:bg-red-600 hover:text-white shadow px-4 py-2 rounded">Logout</button>
             </>
           ) : (
             <>
