@@ -259,7 +259,7 @@ export default function PatientDashboard() {
                   <div className="p-6 sm:p-8 space-y-6">
                     <div className="flex flex-col sm:flex-row items-center gap-6">
                       <div className="w-32 h-32 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
-                        <User className="w-16 h-16 text-white" />
+                        <User className="w-16 h-16 text-black" />
                       </div>
                       <div className="text-center sm:text-left">
                         <h2 className="text-3xl font-bold text-gray-900">
