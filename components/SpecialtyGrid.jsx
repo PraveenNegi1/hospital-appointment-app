@@ -43,7 +43,7 @@ export default function SpecialtyGrid() {
             <button
               key={name}
               onClick={() =>
-                router.push(`/doctor?specialty=${encodeURIComponent(name)}`)
+                router.push(`/doctorprofile?specialty=${encodeURIComponent(name)}`)
               }
               className="group bg-white/90 backdrop-blur rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-3 border border-gray-100"
             >

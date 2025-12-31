@@ -14,7 +14,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
-// This fixes the prerendering error during build
+// Force dynamic rendering to avoid build errors with search params
 export const dynamic = "force-dynamic";
 
 export default function Doctors() {
@@ -50,7 +50,8 @@ export default function Doctors() {
       .trim()
       .replace(/\s+/g, "-")
       .replace(/[^\w\-]+/g, "")
-      .replace(/\-\-+/g, "-");
+      .replace(/\-\-+/g, "-")
+      .replace(/^-+|-+$/g, ""); // clean leading/trailing dashes
 
     const url = specialty
       ? `/doctors/${slug}?from=${encodeURIComponent(specialty)}`
