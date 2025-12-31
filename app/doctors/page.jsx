@@ -1,6 +1,8 @@
 // app/doctors/page.jsx
-export const dynamic = "force-dynamic";
 "use client";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 import { useState, useEffect } from "react";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
