@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth, db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import Navbar from "@/components/Navbar";
+import DashboardNavbar from "@/components/Navbar";
 
 export default function DashboardLayout({ children }) {
   const [role, setRole] = useState(null);
@@ -42,7 +42,7 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="w-full bg-white p-6">
-      <Navbar />
+      <DashboardNavbar />
 
       {children}
     </div>

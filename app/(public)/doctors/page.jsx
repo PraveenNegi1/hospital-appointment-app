@@ -1,9 +1,6 @@
 // app/doctors/page.jsx
 "use client";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 import { useState, useEffect } from "react";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -17,7 +14,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
-// Force dynamic rendering to avoid build errors with search params
+export const dynamic = "force-dynamic";
 
 export default function Doctors() {
   const [doctors, setDoctors] = useState([]);
@@ -26,21 +23,25 @@ export default function Doctors() {
   const specialty = searchParams.get("specialty");
 
   useEffect(() => {
-    let baseQuery = query(
+    let q = query(
       collection(db, "doctors"),
-      where("approved", "==", true)
+      where("approved", "==", true) // Only show admin-approved doctors
     );
 
     if (specialty) {
-      baseQuery = query(
+      q = query(
         collection(db, "doctors"),
         where("approved", "==", true),
         where("specialty", "==", specialty)
       );
     }
 
-    const unsub = onSnapshot(baseQuery, (snap) => {
-      setDoctors(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    const unsub = onSnapshot(q, (snapshot) => {
+      const docs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setDoctors(docs);
     });
 
     return () => unsub();
@@ -53,7 +54,7 @@ export default function Doctors() {
       .replace(/\s+/g, "-")
       .replace(/[^\w\-]+/g, "")
       .replace(/\-\-+/g, "-")
-      .replace(/^-+|-+$/g, ""); // clean leading/trailing dashes
+      .replace(/^-+|-+$/g, "");
 
     const url = specialty
       ? `/doctors/${slug}?from=${encodeURIComponent(specialty)}`
@@ -91,7 +92,7 @@ export default function Doctors() {
             <p className="text-3xl font-semibold text-gray-600">
               {specialty
                 ? `No ${specialty}s available at the moment`
-                : "No approved doctors yet"}
+                : "No doctors available yet"}
             </p>
             <p className="text-lg text-gray-500 mt-4">
               Please check back later.
@@ -102,8 +103,8 @@ export default function Doctors() {
             {doctors.map((doctor) => (
               <div
                 key={doctor.id}
-                className="group bg-white/90 backdrop-blur-lg rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-200 cursor-pointer"
                 onClick={() => handleViewDoctor(doctor)}
+                className="group bg-white/90 backdrop-blur-lg rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-200 cursor-pointer"
               >
                 <div className="h-52 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 relative flex items-center justify-center">
                   <div className="absolute inset-0 bg-black/20" />

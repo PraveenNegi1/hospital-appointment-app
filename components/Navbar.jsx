@@ -6,7 +6,7 @@ import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function Navbar() {
+export default function DashboardNavbar() {
   const [user, setUser] = useState(null);
   const router = useRouter();
 
