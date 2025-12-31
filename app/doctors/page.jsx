@@ -1,4 +1,5 @@
 // app/doctors/page.jsx
+export const dynamic = "force-dynamic";
 "use client";
 
 import { useState, useEffect } from "react";
@@ -15,7 +16,6 @@ import {
 } from "lucide-react";
 
 // Force dynamic rendering to avoid build errors with search params
-export const dynamic = "force-dynamic";
 
 export default function Doctors() {
   const [doctors, setDoctors] = useState([]);
