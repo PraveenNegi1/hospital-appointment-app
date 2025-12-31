@@ -1,4 +1,4 @@
-// components/SpecialtyGrid.jsx or wherever you have it
+// app/components/SpecialtyGrid.jsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -35,7 +35,7 @@ export default function SpecialtyGrid() {
           Find Doctors by Specialty
         </h2>
         <p className="text-center text-xl text-gray-600 mb-12">
-          Choose a specialty to view our expert doctors 
+          Choose a specialty to view our expert doctors
         </p>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">

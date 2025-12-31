@@ -14,6 +14,9 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
+// This fixes the prerendering error during build
+export const dynamic = "force-dynamic";
+
 export default function Doctors() {
   const [doctors, setDoctors] = useState([]);
   const router = useRouter();
@@ -49,7 +52,6 @@ export default function Doctors() {
       .replace(/[^\w\-]+/g, "")
       .replace(/\-\-+/g, "-");
 
-    // Preserve the current specialty in the URL
     const url = specialty
       ? `/doctors/${slug}?from=${encodeURIComponent(specialty)}`
       : `/doctors/${slug}`;
@@ -60,7 +62,6 @@ export default function Doctors() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-extrabold text-gray-900 flex items-center justify-center gap-4 mb-4">
             <Stethoscope className="w-14 h-14 text-indigo-600" />
@@ -72,18 +73,15 @@ export default function Doctors() {
               : "Browse our verified and trusted medical professionals"}
           </p>
 
-          {specialty && (
-            <button
-              onClick={() => router.push("/")}
-              className="mt-8 inline-flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur rounded-full shadow-md hover:shadow-lg transition text-indigo-600 font-medium"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              Back to Home
-            </button>
-          )}
+          <button
+            onClick={() => router.push("/")}
+            className="mt-8 inline-flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur rounded-full shadow-md hover:shadow-lg transition text-indigo-600 font-medium"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Back to Home
+          </button>
         </div>
 
-        {/* Doctors Grid */}
         {doctors.length === 0 ? (
           <div className="text-center py-32 bg-white/80 backdrop-blur rounded-3xl shadow-2xl border border-gray-200">
             <User className="w-32 h-32 text-gray-300 mx-auto mb-8" />
