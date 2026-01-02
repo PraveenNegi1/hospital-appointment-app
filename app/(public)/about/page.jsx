@@ -5,7 +5,6 @@ import Image from "next/image";
 export default function AboutPage() {
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* ================= Hero Section ================= */}
       <section className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
@@ -18,7 +17,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ================= Who We Are ================= */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
           <div>
@@ -38,7 +36,6 @@ export default function AboutPage() {
             </p>
           </div>
 
-          {/* Responsive Image */}
           <div className="relative w-full aspect-[4/3] md:aspect-[16/9] rounded-3xl overflow-hidden shadow-xl bg-white">
             <Image
               src="/aboutherbanner.svg"
@@ -51,7 +48,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ================= Mission ================= */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
           <div>
@@ -76,7 +72,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ================= How It Works ================= */}
       <section className="bg-white py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-10 text-gray-900">
@@ -92,7 +87,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ================= Stats ================= */}
       <section className="bg-indigo-600 py-12 md:py-16 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
           <Stat value="10k+" label="Patients Served" />
@@ -102,7 +96,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ================= Doctors Banner ================= */}
       <section className="bg-gray-100 py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900">
@@ -136,7 +129,6 @@ export default function AboutPage() {
   );
 }
 
-/* ================= Components ================= */
 
 function StepCard({ number, title }) {
   return (
