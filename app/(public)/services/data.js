@@ -62,8 +62,8 @@ export const servicesData = [
   },
 
   {
-    slug: "cardiology",
-    title: "Cardiology",
+    slug: "Cardiologist",
+    title: "Cardiologist",
     shortDesc: "Advanced heart care, diagnostics, and surgical treatments.",
     icon: HeartPulse,
     points: ["ECG & Echo", "Heart Surgery", "Preventive Care"],

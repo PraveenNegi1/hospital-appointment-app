@@ -2,15 +2,24 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, HeartPulse } from "lucide-react";
+import { Menu, X, HeartPulse, LogOut, User } from "lucide-react";
+import { useAuth } from "@/lib/authContext";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const { user, loading, logout } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+    setOpen(false);
+    router.push("/auth/login");
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-        
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <HeartPulse className="w-8 h-8 text-indigo-600" />
@@ -21,32 +30,46 @@ export default function Navbar() {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-10">
-          <Link
-            href="/about"
-            className="text-gray-700 font-medium hover:text-indigo-600 transition"
-          >
+          <Link href="/about" className="text-gray-700 font-medium hover:text-indigo-600 transition">
             About
           </Link>
-
-          <Link
-            href="/doctors"
-            className="text-gray-700 font-medium hover:text-indigo-600 transition"
-          >
+          <Link href="/doctors" className="text-gray-700 font-medium hover:text-indigo-600 transition">
             Doctors
           </Link>
 
-          <Link
-            href="/login"
-            className="px-6 py-2 bg-indigo-600 text-white rounded-full font-semibold hover:bg-indigo-700 transition"
-          >
-            Login
-          </Link>
+          {loading ? (
+            <div className="w-40 h-10 bg-gray-200 rounded-full animate-pulse" />
+          ) : user ? (
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3">
+                <User className="w-6 h-6 text-indigo-600" />
+                <span className="font-semibold text-gray-800">
+                  Hi, {user.name}
+                </span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 text-red-600 hover:text-red-700 font-medium transition"
+              >
+                <LogOut className="w-5 h-5" />
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/auth/signup"  // ← Fixed: use correct path
+              className="px-6 py-3 bg-indigo-600 text-white rounded-full font-semibold hover:bg-indigo-700 transition shadow-md"
+            >
+              Sign Up
+            </Link>
+          )}
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Toggle */}
         <button
           className="md:hidden text-gray-700"
           onClick={() => setOpen(!open)}
+          aria-label="Toggle menu"
         >
           {open ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
         </button>
@@ -54,31 +77,46 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {open && (
-        <div className="md:hidden bg-white border-t border-gray-200">
-          <div className="flex flex-col gap-4 px-6 py-6">
+        <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
+          <div className="flex flex-col gap-6 px-6 py-8">
             <Link
-              href="/#about"
+              href="/about"
               onClick={() => setOpen(false)}
-              className="text-gray-700 font-medium hover:text-indigo-600"
+              className="text-gray-700 font-medium text-lg hover:text-indigo-600 transition"
             >
               About
             </Link>
-
             <Link
               href="/doctors"
               onClick={() => setOpen(false)}
-              className="text-gray-700 font-medium hover:text-indigo-600"
+              className="text-gray-700 font-medium text-lg hover:text-indigo-600 transition"
             >
               Doctors
             </Link>
 
-            <Link
-              href="/login"
-              onClick={() => setOpen(false)}
-              className="px-6 py-3 text-center bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition"
-            >
-              Login
-            </Link>
+            {user ? (
+              <>
+                <div className="border-t border-gray-200 pt-6">
+                  <p className="text-sm text-gray-600 mb-1">Signed in as</p>
+                  <p className="font-bold text-gray-900 text-lg">{user.name}</p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center justify-center gap-3 py-4 px-6 bg-red-50 text-red-600 font-semibold rounded-xl hover:bg-red-100 transition"
+                >
+                  <LogOut className="w-5 h-5" />
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/auth/signup"
+                onClick={() => setOpen(false)}
+                className="block text-center px-8 py-4 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition shadow-md"
+              >
+                Sign Up
+              </Link>
+            )}
           </div>
         </div>
       )}
