@@ -1,4 +1,17 @@
-import { Ambulance, HeartPulse, Brain, Baby } from "lucide-react";
+import { 
+  Ambulance, 
+  HeartPulse, 
+  Brain, 
+  Baby, 
+  Stethoscope, 
+  Dna, 
+  Microscope, 
+  Bone, 
+  Eye, 
+  Ear, 
+  Scissors, 
+  LucideParkingSquare
+} from "lucide-react";
 
 export const servicesData = [
   {
@@ -96,8 +109,7 @@ export const servicesData = [
   {
     slug: "neurology",
     title: "Neurology",
-    shortDesc:
-      "Specialized care for brain, spine, and nervous system disorders.",
+    shortDesc: "Specialized care for brain, spine, and nervous system disorders.",
     icon: Brain,
     points: ["Stroke Care", "Neuro Imaging", "Expert Neurologists"],
 
@@ -175,6 +187,282 @@ export const servicesData = [
         {
           q: "Is vaccination available for all age groups?",
           a: "Yes, we provide a complete immunization schedule for children.",
+        },
+      ],
+    },
+  },
+
+  // ── NEW SERVICES ───────────────────────────────────────────────────────
+
+  {
+    slug: "orthopedics",
+    title: "Orthopedics",
+    shortDesc: "Expert care for bones, joints, muscles, and sports injuries.",
+    icon: Bone,
+    points: ["Joint Replacement", "Fracture Care", "Arthroscopy"],
+
+    content: {
+      overview:
+        "Our Orthopedics department specializes in the diagnosis, treatment, and rehabilitation of musculoskeletal conditions, helping patients regain mobility and function.",
+
+      treatments: [
+        "Joint replacement (knee, hip, shoulder)",
+        "Fracture management",
+        "Arthroscopic surgery",
+        "Spine surgery",
+        "Sports injury treatment",
+      ],
+
+      facilities: [
+        "Advanced Operation Theatres",
+        "Digital X-ray & Fluoroscopy",
+        "Physiotherapy & Rehabilitation Center",
+        "Plaster & Casting Room",
+      ],
+
+      doctors: [
+        "Orthopedic Surgeons",
+        "Joint Replacement Specialists",
+        "Spine Surgeons",
+        "Sports Medicine Experts",
+      ],
+
+      faqs: [
+        {
+          q: "Do you perform knee replacement surgery?",
+          a: "Yes, we offer both total and partial knee replacement procedures.",
+        },
+        {
+          q: "Is physiotherapy available after surgery?",
+          a: "Yes, we have an in-house physiotherapy team for post-operative rehabilitation.",
+        },
+      ],
+    },
+  },
+
+  {
+    slug: "obstetrics-gynecology",
+    title: "Obstetrics & Gynecology",
+    shortDesc: "Complete care for women's health, pregnancy, and childbirth.",
+    icon: Stethoscope,
+    points: ["Normal & C-Section Delivery", "High-Risk Pregnancy", "Laparoscopic Surgery"],
+
+    content: {
+      overview:
+        "Our Obstetrics & Gynecology department provides comprehensive care for women at every stage of life, from routine check-ups to high-risk pregnancies and advanced gynecological surgeries.",
+
+      treatments: [
+        "Normal & cesarean deliveries",
+        "High-risk pregnancy management",
+        "Laparoscopic gynecological surgery",
+        "Infertility evaluation & treatment",
+        "Menopause care",
+      ],
+
+      facilities: [
+        "Labor & Delivery Suites",
+        "Modern Operation Theatres",
+        "Level III NICU",
+        "Ultrasound & Fetal Monitoring",
+      ],
+
+      doctors: [
+        "Obstetricians & Gynecologists",
+        "Fetal Medicine Specialists",
+        "Laparoscopic Surgeons",
+        "Infertility Specialists",
+      ],
+
+      faqs: [
+        {
+          q: "Do you have facilities for high-risk pregnancies?",
+          a: "Yes, we have a dedicated high-risk pregnancy unit with fetal medicine experts.",
+        },
+        {
+          q: "Is painless delivery available?",
+          a: "Yes, we offer epidural analgesia for painless labor.",
+        },
+      ],
+    },
+  },
+
+  {
+    slug: "pulmonology",
+    title: "Pulmonology",
+    shortDesc: "Specialized care for lung and respiratory conditions.",
+    icon: LucideParkingSquare,
+    points: ["Asthma Management", "COPD Care", "Sleep Studies"],
+
+    content: {
+      overview:
+        "Our Pulmonology department offers advanced diagnosis and treatment for a wide range of respiratory disorders, helping patients breathe easier.",
+
+      treatments: [
+        "Asthma & allergy management",
+        "COPD & chronic bronchitis",
+        "Pneumonia treatment",
+        "Tuberculosis management",
+        "Sleep apnea diagnosis & treatment",
+      ],
+
+      facilities: [
+        "Pulmonary Function Test Lab",
+        "Sleep Study Lab",
+        "Bronchoscopy Suite",
+        "Respiratory ICU",
+      ],
+
+      doctors: [
+        "Pulmonologists",
+        "Sleep Medicine Specialists",
+        "Critical Care Pulmonologists",
+      ],
+
+      faqs: [
+        {
+          q: "Do you treat sleep apnea?",
+          a: "Yes, we conduct sleep studies and provide CPAP/BiPAP therapy.",
+        },
+        {
+          q: "Is bronchoscopy available?",
+          a: "Yes, we perform diagnostic and therapeutic bronchoscopy procedures.",
+        },
+      ],
+    },
+  },
+
+  {
+    slug: "oncology",
+    title: "Oncology",
+    shortDesc: "Comprehensive cancer care with advanced treatment options.",
+    icon: Dna,
+    points: ["Chemotherapy", "Radiation Therapy", "Cancer Surgery"],
+
+    content: {
+      overview:
+        "Our Oncology department provides multidisciplinary cancer care, combining medical, surgical, and radiation oncology for the best possible outcomes.",
+
+      treatments: [
+        "Chemotherapy",
+        "Radiation therapy",
+        "Surgical oncology",
+        "Targeted therapy & immunotherapy",
+        "Palliative care",
+      ],
+
+      facilities: [
+        "Linear Accelerator",
+        "Chemotherapy Day Care Unit",
+        "Bone Marrow Transplant Unit",
+        "Tumor Board Meetings",
+      ],
+
+      doctors: [
+        "Medical Oncologists",
+        "Surgical Oncologists",
+        "Radiation Oncologists",
+        "Palliative Care Specialists",
+      ],
+
+      faqs: [
+        {
+          q: "Do you offer immunotherapy?",
+          a: "Yes, we provide the latest immunotherapy treatments for eligible cancers.",
+        },
+        {
+          q: "Is there a dedicated cancer ward?",
+          a: "Yes, we have specialized oncology wards and day care facilities.",
+        },
+      ],
+    },
+  },
+
+  {
+    slug: "ophthalmology",
+    title: "Ophthalmology",
+    shortDesc: "Advanced eye care, cataract surgery, and vision correction.",
+    icon: Eye,
+    points: ["Cataract Surgery", "Laser Vision Correction", "Retina Services"],
+
+    content: {
+      overview:
+        "Our Ophthalmology department delivers comprehensive eye care, from routine eye exams to complex retinal surgeries and vision correction procedures.",
+
+      treatments: [
+        "Cataract surgery (phacoemulsification)",
+        "LASIK & other refractive surgeries",
+        "Retina & vitreoretinal surgery",
+        "Glaucoma management",
+        "Cornea transplant",
+      ],
+
+      facilities: [
+        "State-of-the-art Operation Theatres",
+        "Optical Coherence Tomography (OCT)",
+        "Fundus Camera & Fluorescein Angiography",
+        "YAG & Green Laser",
+      ],
+
+      doctors: [
+        "Ophthalmologists",
+        "Retina Specialists",
+        "Cornea Specialists",
+        "Glaucoma Specialists",
+      ],
+
+      faqs: [
+        {
+          q: "Do you perform LASIK surgery?",
+          a: "Yes, we offer LASIK and other laser vision correction procedures.",
+        },
+        {
+          q: "Is cataract surgery done with laser?",
+          a: "Yes, we provide both conventional and femtosecond laser-assisted cataract surgery.",
+        },
+      ],
+    },
+  },
+
+  {
+    slug: "general-surgery",
+    title: "General Surgery",
+    shortDesc: "Expert surgical care for a wide range of conditions.",
+    icon: Scissors,
+    points: ["Laparoscopic Surgery", "Hernia Repair", "Gallbladder Surgery"],
+
+    content: {
+      overview:
+        "Our General Surgery department handles both elective and emergency surgical procedures using minimally invasive and traditional techniques.",
+
+      treatments: [
+        "Laparoscopic (keyhole) surgery",
+        "Hernia repair (open & laparoscopic)",
+        "Appendectomy & cholecystectomy",
+        "Breast surgery",
+        "Thyroid & parathyroid surgery",
+      ],
+
+      facilities: [
+        "Modular Operation Theatres",
+        "Laparoscopic & Endoscopic Equipment",
+        "Post-operative Recovery Unit",
+        "Day Care Surgery Unit",
+      ],
+
+      doctors: [
+        "General & Laparoscopic Surgeons",
+        "Breast Surgeons",
+        "Endocrine Surgeons",
+      ],
+
+      faqs: [
+        {
+          q: "Do you perform laparoscopic surgeries?",
+          a: "Yes, most abdominal surgeries are performed laparoscopically when possible.",
+        },
+        {
+          q: "Is day care surgery available?",
+          a: "Yes, we offer day care surgery for suitable procedures like hernia repair and piles surgery.",
         },
       ],
     },

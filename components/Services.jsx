@@ -7,6 +7,9 @@ import { ShieldCheck } from "lucide-react";
 import { servicesData } from "@/app/(public)/services/data";
 
 export default function Services() {
+  // Take only the first 4 services
+  const displayedServices = servicesData.slice(0, 4);
+
   return (
     <section className="py-12 md:py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -21,9 +24,9 @@ export default function Services() {
           </p>
         </div>
 
-        {/* Services Grid */}
+        {/* Services Grid - Only 4 cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {servicesData.map((service) => {
+          {displayedServices.map((service) => {
             const Icon = service.icon;
 
             return (
