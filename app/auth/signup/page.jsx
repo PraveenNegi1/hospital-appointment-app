@@ -24,6 +24,7 @@ export default function Signup() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // Create user profile in Firestore
       await setDoc(doc(db, "users", user.uid), {
         name: name.trim(),
         email: email.toLowerCase(),
@@ -31,10 +32,15 @@ export default function Signup() {
         createdAt: new Date(),
       });
 
+      // Set cookie for middleware (role-based protection)
+      document.cookie = `userRole=patient; path=/; max-age=${60 * 60 * 24 * 365}`;
+
+      // Save to localStorage for navbar
       localStorage.setItem("loginTime", Date.now().toString());
       localStorage.setItem("userName", name.trim());
       localStorage.setItem("userRole", "patient");
 
+      // Redirect to main website
       router.push("/");
     } catch (err) {
       let message = "Failed to create account.";
@@ -68,7 +74,7 @@ export default function Signup() {
                 <p className="font-medium">{error}</p>
                 {error.includes("already registered") && (
                   <Link
-                    href="/login"
+                    href="/auth/login"
                     className="mt-3 inline-block text-purple-600 font-semibold hover:underline"
                   >
                     → Go to Login Page
@@ -133,7 +139,6 @@ export default function Signup() {
               </button>
             </form>
 
-            {/* Correct link to Login page */}
             <div className="mt-8 text-center">
               <p className="text-gray-600">
                 Already have an account?{" "}
@@ -148,7 +153,6 @@ export default function Signup() {
           </div>
         </div>
 
-        {/* Decorative blobs */}
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-pink-400 rounded-full opacity-20 blur-3xl"></div>
         <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-400 rounded-full opacity-20 blur-3xl"></div>
       </div>

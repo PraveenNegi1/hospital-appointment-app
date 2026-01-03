@@ -32,12 +32,24 @@ export default function Login() {
       }
 
       const userData = userDoc.data();
+      const role = userData.role || "patient";
 
+      // Set cookie for middleware
+      document.cookie = `userRole=${role}; path=/; max-age=${60 * 60 * 24 * 365}`;
+
+      // Save to localStorage for navbar
       localStorage.setItem("loginTime", Date.now().toString());
       localStorage.setItem("userName", userData.name || "User");
-      localStorage.setItem("userRole", userData.role || "patient");
+      localStorage.setItem("userRole", role);
 
-      router.push("/");
+      // Role-based redirection
+      if (role === "admin") {
+        router.push("/dashboard/admin");
+      } else if (role === "doctor") {
+        router.push("/dashboard/doctor");
+      } else {
+        router.push("/"); // Patient → main website
+      }
     } catch (err) {
       let message = "Invalid email or password.";
       if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
@@ -71,7 +83,9 @@ export default function Login() {
 
             <form onSubmit={handleLogin} className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Email Address
+                </label>
                 <input
                   type="email"
                   value={email}
@@ -83,7 +97,9 @@ export default function Login() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Password
+                </label>
                 <input
                   type="password"
                   value={password}
@@ -106,7 +122,10 @@ export default function Login() {
             <div className="mt-8 text-center">
               <p className="text-gray-600">
                 Don't have an account?{" "}
-                <Link href="/auth/signup" className="text-purple-600 font-semibold hover:text-purple-800 transition">
+                <Link
+                  href="/auth/signup"
+                  className="text-purple-600 font-semibold hover:text-purple-800 transition"
+                >
                   Sign up
                 </Link>
               </p>

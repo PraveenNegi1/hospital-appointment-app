@@ -1,352 +1,407 @@
-// app/components/AddDoctorForm.jsx
+// components/AddDoctorForm.jsx
 "use client";
 
 import { useState } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { CheckCircle, UserPlus } from "lucide-react";
+import { auth, db } from "@/lib/firebase";
 
 export default function AddDoctorForm() {
-  const [formData, setFormData] = useState({
-    name: "",
-    specialty: "",
-    email: "",
-    phone: "",
-    clinicName: "",
-    address: "",
-    qualifications: "",
-    experience: "",
-    fee: "",
-    bio: "",
-    photoURL: "",
-  });
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [specialty, setSpecialty] = useState("");
+  const [phone, setPhone] = useState("");
+  const [experience, setExperience] = useState("");
+  const [fee, setFee] = useState("");
+  const [qualification, setQualification] = useState("");
+  const [hospital, setHospital] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [pincode, setPincode] = useState("");
+  const [about, setAbout] = useState("");
+  const [languages, setLanguages] = useState("");
+  const [approved, setApproved] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   const specialties = [
-    "General Physician",
-    "Cardiologist",
-    "Dermatologist",
-    "Pediatrician",
-    "Orthopedic",
-    "Neurologist",
-    "Gynecologist",
-    "Dentist",
-    "Psychiatrist",
+    "Cardiology",
+    "Neurology",
+    "Pediatrics",
+    "Orthopedics",
+    "Dermatology",
+    "Gynecology",
+    "Psychiatry",
+    "General Medicine",
+    "ENT",
+    "Ophthalmology",
+    "Gastroenterology",
+    "Urology",
+    "Endocrinology",
+    "Nephrology",
+    "Oncology",
+    "Pulmonology",
+    "Rheumatology",
+    "Dentistry",
+    "Physiotherapy",
+    "Radiology",
   ];
 
-  const generateDefaultSlots = () => {
-    const slots = {};
-    const today = new Date();
-    const timeSlots = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"];
-
-    for (let i = 1; i <= 14; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
-      const dateStr = date.toISOString().split("T")[0];
-      slots[dateStr] = timeSlots;
-    }
-    return slots;
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setError("");
-  };
-
-  const handleSubmit = async (e) => {
+  const handleAddDoctor = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage("");
+    setError("");
 
-    if (!formData.name || !formData.email || !formData.specialty) {
-      setError("Name, Email and Specialty are required.");
+    if (!specialty) {
+      setError("Please select a specialty.");
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
-    setError("");
-
     try {
-      const doctorId = formData.email.trim().toLowerCase();
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
 
-      await setDoc(doc(db, "doctors", doctorId), {
-        name: formData.name.trim(),
-        specialty: formData.specialty.trim(),
-        email: doctorId,
-        phone: formData.phone.trim() || "",
-        clinicName: formData.clinicName.trim() || "Not specified",
-        address: formData.address.trim() || "Not specified",
-        qualifications: formData.qualifications.trim() || "Not specified",
-        experience: formData.experience ? Number(formData.experience) : 0,
-        fee: formData.fee ? Number(formData.fee) : 0,
-        bio: formData.bio.trim() || "Dedicated to excellent patient care.",
-        photoURL: formData.photoURL.trim() || "",
-        availableSlots: generateDefaultSlots(),
-        approved: false, // Pending admin approval
-        requestedAt: new Date(),
+      await setDoc(doc(db, "doctors", user.uid), {
+        name: name.trim(),
+        email: email.toLowerCase(),
+        specialty,
+        phone: phone.trim(),
+        experience: parseInt(experience) || 0,
+        fee: parseInt(fee) || 0,
+        qualification: qualification.trim(),
+        hospital: hospital.trim(),
+        address: address.trim(),
+        city: city.trim(),
+        state: state.trim(),
+        pincode: pincode.trim(),
+        about: about.trim(),
+        languages: languages.trim(),
+        approved,
+        createdAt: new Date(),
+        uid: user.uid,
+      });
+
+      await setDoc(doc(db, "users", user.uid), {
+        name: name.trim(),
+        email: email.toLowerCase(),
+        role: "doctor",
         createdAt: new Date(),
       });
 
-      setSubmitted(true);
+      setMessage(`Doctor "${name}" created successfully!`);
+      // Reset form
+      setEmail("");
+      setPassword("");
+      setName("");
+      setSpecialty("");
+      setPhone("");
+      setExperience("");
+      setFee("");
+      setQualification("");
+      setHospital("");
+      setAddress("");
+      setCity("");
+      setState("");
+      setPincode("");
+      setAbout("");
+      setLanguages("");
+      setApproved(false);
     } catch (err) {
-      console.error("Error submitting doctor:", err);
-      setError("Failed to submit. " + (err.message || "Try again."));
+      let msg = "Failed to create doctor.";
+      if (err.code === "auth/email-already-in-use")
+        msg = "Email already exists.";
+      if (err.code === "auth/weak-password")
+        msg = "Password too weak (min 6 chars).";
+      if (err.code === "auth/invalid-email") msg = "Invalid email.";
+      setError(msg);
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const resetForm = () => {
-    setSubmitted(false);
-    setFormData({
-      name: "",
-      specialty: "",
-      email: "",
-      phone: "",
-      clinicName: "",
-      address: "",
-      qualifications: "",
-      experience: "",
-      fee: "",
-      bio: "",
-      photoURL: "",
-    });
-    setError("");
-  };
-
-  // Success View
-  if (submitted) {
-    return (
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-10 text-center">
-        <CheckCircle className="w-20 h-20 text-green-600 mx-auto mb-6" />
-        <h3 className="text-3xl font-bold text-green-800 mb-4">
-          Doctor Profile Submitted!
-        </h3>
-        <p className="text-xl text-gray-700 mb-8">
-          <strong>Add New Doctor (Pending Admin Approval)</strong>
-        </p>
-        <p className="text-gray-600 mb-8">
-          Your profile has been sent for review. You will be able to log in once the admin approves it.
-        </p>
-        <button
-          onClick={resetForm}
-          className="inline-flex items-center gap-3 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-xl transition shadow-lg"
-        >
-          <UserPlus className="w-6 h-6" />
-          Add Another Doctor
-        </button>
-      </div>
-    );
-  }
-
-  // Form View
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6">
-          <h3 className="text-3xl font-bold text-white text-center flex items-center justify-center gap-4">
-            <UserPlus className="w-10 h-10" />
-            Add New Doctor (Pending Admin Approval)
-          </h3>
+    <div className="bg-gray-50 p-8 rounded-2xl">
+      <h3 className="text-2xl font-bold text-gray-900 mb-6">
+        Create New Doctor Account
+      </h3>
+
+      {message && (
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl">
+          {message}
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl">
+          {error}
+        </div>
+      )}
+
+      <form
+        onSubmit={handleAddDoctor}
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+      >
+        {/* Basic Info */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Full Name
+          </label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Dr. John Smith"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 text-black"
+            required
+            disabled={loading}
+          />
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-8">
-          {error && (
-            <div className="bg-red-50 border border-red-300 text-red-700 px-6 py-4 rounded-xl text-center">
-              {error}
-            </div>
-          )}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Email
+          </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="doctor@hospital.com"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 text-black"
+            required
+            disabled={loading}
+          />
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Full Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Dr. Sarah Johnson"
-                required
-                className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-300 focus:border-indigo-500 transition"
-              />
-            </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Password
+          </label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 text-black"
+            required
+            minLength="6"
+            disabled={loading}
+          />
+        </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Specialty <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="specialty"
-                value={formData.specialty}
-                onChange={handleChange}
-                required
-                className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-300 focus:border-indigo-500 transition"
-              >
-                <option value="">-- Choose Specialty --</option>
-                {specialties.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Specialty
+          </label>
+          <select
+            value={specialty}
+            onChange={(e) => setSpecialty(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 bg-white text-black"
+            required
+            disabled={loading}
+          >
+            <option value="">Select specialty</option>
+            {specialties.map((spec) => (
+              <option key={spec} value={spec}>
+                {spec}
+              </option>
+            ))}
+          </select>
+        </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Email (Your Login ID) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="sarah@example.com"
-                required
-                className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-300 focus:border-indigo-500 transition"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                This will be your login username
-              </p>
-            </div>
+        {/* Professional Details */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Qualification
+          </label>
+          <input
+            type="text"
+            value={qualification}
+            onChange={(e) => setQualification(e.target.value)}
+            placeholder="MBBS, MD (Cardiology)"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 text-black"
+            required
+            disabled={loading}
+          />
+        </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="+91 98765 43210"
-                className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-300 focus:border-indigo-500 transition"
-              />
-            </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Experience (years)
+          </label>
+          <input
+            type="number"
+            value={experience}
+            onChange={(e) => setExperience(e.target.value)}
+            placeholder="15"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 text-black"
+            min="0"
+            disabled={loading}
+          />
+        </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Clinic / Hospital Name
-              </label>
-              <input
-                type="text"
-                name="clinicName"
-                value={formData.clinicName}
-                onChange={handleChange}
-                placeholder="Healing Hands Clinic"
-                className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-300 focus:border-indigo-500 transition"
-              />
-            </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Consultation Fee (₹)
+          </label>
+          <input
+            type="number"
+            value={fee}
+            onChange={(e) => setFee(e.target.value)}
+            placeholder="800"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 text-black"
+            min="0"
+            disabled={loading}
+          />
+        </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Consultation Fee (₹)
-              </label>
-              <input
-                type="number"
-                name="fee"
-                value={formData.fee}
-                onChange={handleChange}
-                placeholder="800"
-                min="0"
-                className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-300 focus:border-indigo-500 transition"
-              />
-            </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Hospital/Clinic Name
+          </label>
+          <input
+            type="text"
+            value={hospital}
+            onChange={(e) => setHospital(e.target.value)}
+            placeholder="Apollo Hospital"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 text-black"
+            disabled={loading}
+          />
+        </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Years of Experience
-              </label>
-              <input
-                type="number"
-                name="experience"
-                value={formData.experience}
-                onChange={handleChange}
-                placeholder="12"
-                min="0"
-                className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-300 focus:border-indigo-500 transition"
-              />
-            </div>
+        {/* Contact & Address */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Phone Number
+          </label>
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+91 98765 43210"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 text-black"
+            disabled={loading}
+          />
+        </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Qualifications
-              </label>
-              <input
-                type="text"
-                name="qualifications"
-                value={formData.qualifications}
-                onChange={handleChange}
-                placeholder="MBBS, MD (Medicine)"
-                className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-300 focus:border-indigo-500 transition"
-              />
-            </div>
-          </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Languages Spoken
+          </label>
+          <input
+            type="text"
+            value={languages}
+            onChange={(e) => setLanguages(e.target.value)}
+            placeholder="English, Hindi, Tamil"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 text-black"
+            disabled={loading}
+          />
+        </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Clinic Address
-            </label>
-            <textarea
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              rows="3"
-              placeholder="123 Wellness Street, Mumbai, India"
-              className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-300 focus:border-indigo-500 transition"
-            />
-          </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Clinic Address
+          </label>
+          <input
+            type="text"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="123 Main Road, Near Metro Station"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 text-black"
+            disabled={loading}
+          />
+        </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Bio / About You
-            </label>
-            <textarea
-              name="bio"
-              value={formData.bio}
-              onChange={handleChange}
-              rows="5"
-              placeholder="Tell patients about your experience and approach..."
-              className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-300 focus:border-indigo-500 transition"
-            />
-          </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            City
+          </label>
+          <input
+            type="text"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder="Mumbai"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 text-black"
+            disabled={loading}
+          />
+        </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Profile Photo URL (Optional)
-            </label>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            State
+          </label>
+          <input
+            type="text"
+            value={state}
+            onChange={(e) => setState(e.target.value)}
+            placeholder="Maharashtra"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 text-black"
+            disabled={loading}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Pincode
+          </label>
+          <input
+            type="text"
+            value={pincode}
+            onChange={(e) => setPincode(e.target.value)}
+            placeholder="400001"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 text-black"
+            disabled={loading}
+          />
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            About Doctor (Bio)
+          </label>
+          <textarea
+            value={about}
+            onChange={(e) => setAbout(e.target.value)}
+            placeholder="Brief description about experience, approach, and expertise..."
+            rows="4"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 text-black resize-none"
+            disabled={loading}
+          />
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="flex items-center gap-3 cursor-pointer">
             <input
-              type="url"
-              name="photoURL"
-              value={formData.photoURL}
-              onChange={handleChange}
-              placeholder="https://example.com/photo.jpg"
-              className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-300 focus:border-indigo-500 transition"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Upload your photo to ImgBB or similar and paste the direct link.
-            </p>
-          </div>
-
-          <div className="text-center pt-8">
-            <button
-              type="submit"
+              type="checkbox"
+              checked={approved}
+              onChange={(e) => setApproved(e.target.checked)}
+              className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
               disabled={loading}
-              className="inline-flex items-center gap-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-xl py-5 px-12 rounded-2xl shadow-2xl transition transform hover:scale-105 disabled:opacity-70"
-            >
-              <UserPlus className="w-8 h-8" />
-              {loading ? "Submitting..." : "Submit for Admin Approval"}
-            </button>
-          </div>
+            />
+            <span className="text-gray-700 font-medium">
+              Auto-approve this doctor (visible to patients immediately)
+            </span>
+          </label>
+        </div>
 
-          <p className="text-center text-sm text-gray-600 mt-6">
-            After admin approval, you will be able to log in with your email and password.
-          </p>
-        </form>
-      </div>
+        <div className="md:col-span-2">
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-5 rounded-xl hover:from-blue-700 hover:to-purple-700 transition shadow-xl disabled:opacity-70 disabled:cursor-not-allowed text-lg"
+          >
+            {loading ? "Creating Doctor Account..." : "Create Doctor Account"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
