@@ -20,7 +20,6 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <HeartPulse className="w-8 h-8 text-indigo-600" />
           <span className="text-2xl font-extrabold text-gray-900">
@@ -28,7 +27,6 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-10">
           <Link href="/about" className="text-gray-700 font-medium hover:text-indigo-600 transition">
             About
@@ -57,7 +55,7 @@ export default function Navbar() {
             </div>
           ) : (
             <Link
-              href="/auth/signup"  // ← Fixed: use correct path
+              href="/auth/signup" 
               className="px-6 py-3 bg-indigo-600 text-white rounded-full font-semibold hover:bg-indigo-700 transition shadow-md"
             >
               Sign Up
