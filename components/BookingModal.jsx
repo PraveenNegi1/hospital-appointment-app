@@ -92,7 +92,6 @@ export default function BookingModal({ doctor, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full my-8">
-        {/* Header */}
         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-3xl p-6 text-white relative">
           <button
             onClick={onClose}
@@ -116,7 +115,6 @@ export default function BookingModal({ doctor, onClose }) {
           </div>
         </div>
 
-        {/* Form Body */}
         <div className="p-6 sm:p-8 space-y-6 max-h-[70vh] overflow-y-auto">
           {/* Date & Time Selection */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -169,7 +167,6 @@ export default function BookingModal({ doctor, onClose }) {
             </div>
           </div>
 
-          {/* Patient Details */}
           <div className="border-t pt-6">
             <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
               <User className="w-6 h-6 text-purple-600" />
