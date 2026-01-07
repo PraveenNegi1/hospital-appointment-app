@@ -8,15 +8,12 @@ export default function AppointmentCard({ app, isPatient, onCancel }) {
     if (!confirm("Cancel this appointment?")) return;
 
     try {
-      // Return slot
       await updateDoc(doc(db, 'doctors', app.doctorId), {
         [`availableSlots.${app.date}`]: arrayUnion(app.slot)
       });
 
-      // Delete appointment
       await deleteDoc(doc(db, 'appointments', app.id));
 
-      // Send email
       await fetch('/api/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
