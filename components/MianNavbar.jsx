@@ -63,7 +63,6 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile Menu Toggle */}
         <button
           className="md:hidden text-gray-700"
           onClick={() => setOpen(!open)}
