@@ -1,4 +1,3 @@
-// components/AddDoctorForm.jsx
 "use client";
 
 import { useState } from "react";
