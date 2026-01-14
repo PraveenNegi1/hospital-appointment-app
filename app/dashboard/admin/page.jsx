@@ -1,172 +1,344 @@
-// app/dashboard/admin/page.jsx
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, onSnapshot, updateDoc, doc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import AddDoctorForm from "@/components/AddDoctorForm";
-import Link from "next/link";
-import { UserCheck, Clock, Users, AlertCircle } from "lucide-react"; // ← Added Users
+import { Plus, Eye, Trash2, Clock, UserCheck } from "lucide-react";
+
+// API helpers
+async function fetchDoctors() {
+  const res = await fetch("/api/get-doctors");
+  const data = await res.json();
+  return data.doctors || [];
+}
+
+async function createDoctorApi(doctor) {
+  const res = await fetch("/api/create-doctor", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(doctor),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Server error: ${text}`);
+  }
+
+  return await res.json();
+}
+
+async function updateDoctorApi(id, updateData) {
+  await fetch("/api/update-doctor", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, updateData }),
+  });
+}
+
+async function deleteDoctorApi(id) {
+  await fetch("/api/delete-doctor", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
+  });
+}
 
 export default function AdminDashboard() {
-  const [pendingDoctors, setPendingDoctors] = useState([]);
-  const [approvedDoctors, setApprovedDoctors] = useState([]);
+  const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [showForm, setShowForm] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    specialty: "",
+    experience: "",
+    bio: "",
+    fee: "",
+  });
+
+  const specialties = [
+    "Cardiology",
+    "Neurology",
+    "Pediatrics",
+    "Orthopedics",
+    "Dermatology",
+    "Gynecology",
+    "General Medicine",
+    "ENT",
+    "Ophthalmology",
+    "Gastroenterology",
+    "Urology",
+  ];
+
+  const fetchAll = async () => {
+    setLoading(true);
+    const data = await fetchDoctors();
+    setDoctors(data);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const unsub = onSnapshot(
-      collection(db, "doctors"),
-      (snap) => {
-        const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        setPendingDoctors(docs.filter((d) => !d.approved));
-        setApprovedDoctors(docs.filter((d) => d.approved));
-        setLoading(false);
-        setError("");
-      },
-      (err) => {
-        console.error("Firestore error:", err);
-        setError("Failed to load doctors. Check permissions or network.");
-        setLoading(false);
-      }
-    );
-
-    return () => unsub();
+    fetchAll();
   }, []);
 
-  const approveDoctor = async (id, name) => {
-    if (!confirm(`Approve Dr. ${name}? This will make them visible to patients.`)) {
-      return;
-    }
-
+  // Handle form submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      await updateDoc(doc(db, "doctors", id), { approved: true });
-      alert(`Dr. ${name} has been approved!`);
+      const doctorData = {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        specialty: form.specialty,
+        experience: form.experience,
+        bio: form.bio,
+        fee: form.fee,
+      };
+
+      const data = await createDoctorApi(doctorData);
+      console.log("Doctor created:", data);
+
+      // Refresh list
+      fetchAll();
+
+      // Reset form
+      setForm({
+        name: "",
+        email: "",
+        password: "",
+        specialty: "",
+        experience: "",
+        bio: "",
+        fee: "",
+      });
+
+      setShowForm(false);
     } catch (err) {
-      console.error(err);
-      alert("Error approving doctor.");
+      console.error("Error creating doctor:", err);
     }
   };
 
+  const approveDoctor = async (id) => {
+    await updateDoctorApi(id, { approved: true });
+    fetchAll();
+  };
+
+  const deleteDoctor = async (id) => {
+    if (!confirm("Delete doctor?")) return;
+    await deleteDoctorApi(id);
+    fetchAll();
+  };
+
+  const pendingDoctors = doctors.filter((d) => !d.approved);
+  const approvedDoctors = doctors.filter((d) => d.approved);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12 px-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-extrabold text-gray-900 mb-4">Admin Dashboard</h1>
-          <p className="text-xl text-gray-600">Manage doctor registrations and approvals</p>
+    <div className="min-h-screen bg-gray-100 p-4 md:p-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-indigo-600">
+          Admin Dashboard
+        </h1>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700 mt-4 md:mt-0"
+        >
+          <Plus size={18} /> {showForm ? "Hide Form" : "Add Doctor"}
+        </button>
+      </div>
+
+      {/* Add Doctor Form */}
+      {showForm && (
+        <div className="bg-white p-6 rounded-xl shadow-md mb-6">
+          <h2 className="text-xl font-bold mb-4">Add New Doctor</h2>
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
+            <input
+              placeholder="Full Name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              required
+              className="border p-3 rounded w-full focus:ring-2 focus:ring-indigo-400"
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              required
+              className="border p-3 rounded w-full focus:ring-2 focus:ring-indigo-400"
+            />
+            <input
+              type="password"
+              placeholder="Password (min 6 chars)"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              required
+              className="border p-3 rounded w-full focus:ring-2 focus:ring-indigo-400"
+            />
+            <select
+              value={form.specialty}
+              onChange={(e) => setForm({ ...form, specialty: e.target.value })}
+              required
+              className="border p-3 rounded w-full focus:ring-2 focus:ring-indigo-400"
+            >
+              <option value="">Select Specialty</option>
+              {specialties.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+            <input
+              type="number"
+              placeholder="Experience (years)"
+              value={form.experience}
+              onChange={(e) => setForm({ ...form, experience: e.target.value })}
+              className="border p-3 rounded w-full focus:ring-2 focus:ring-indigo-400"
+            />
+            <input
+              type="number"
+              placeholder="Consultation Fee (₹)"
+              value={form.fee}
+              onChange={(e) => setForm({ ...form, fee: e.target.value })}
+              className="border p-3 rounded w-full focus:ring-2 focus:ring-indigo-400"
+            />
+            <textarea
+              placeholder="Bio"
+              value={form.bio}
+              onChange={(e) => setForm({ ...form, bio: e.target.value })}
+              className="border p-3 rounded w-full md:col-span-2 focus:ring-2 focus:ring-indigo-400"
+            />
+            <button
+              type="submit"
+              className="bg-green-600 text-white px-6 py-3 rounded shadow hover:bg-green-700 md:col-span-2"
+            >
+              Create Doctor
+            </button>
+          </form>
         </div>
+      )}
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <div className="bg-white p-8 rounded-3xl shadow-xl text-center">
-            <Clock className="w-12 h-12 text-orange-600 mx-auto mb-4" />
-            <p className="text-gray-600 text-lg">Pending Approvals</p>
-            <p className="text-4xl font-bold text-orange-600 mt-2">{pendingDoctors.length}</p>
+      {/* Pending Doctors */}
+      <section className="mb-6">
+        <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
+          <Clock size={18} /> Pending Doctors
+        </h2>
+        {pendingDoctors.length === 0 ? (
+          <p className="text-gray-500">No pending doctors</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {pendingDoctors.map((d) => (
+              <div
+                key={d.id}
+                className="bg-white p-4 rounded-xl shadow flex flex-col justify-between"
+              >
+                <div>
+                  <h3 className="font-bold text-lg">{d.name}</h3>
+                  <p className="text-gray-600">{d.specialty}</p>
+                  <p className="text-gray-600">Fee: ₹{d.fee || "N/A"}</p>
+                </div>
+                <div className="flex gap-2 mt-4">
+                  <button
+                    onClick={() => approveDoctor(d.id)}
+                    className="bg-green-600 text-white px-3 py-1 rounded flex-1 hover:bg-green-700"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => setSelectedDoctor(d)}
+                    className="bg-blue-600 text-white px-3 py-1 rounded flex-1 hover:bg-blue-700 flex items-center justify-center gap-1"
+                  >
+                    <Eye size={14} /> View
+                  </button>
+                  <button
+                    onClick={() => deleteDoctor(d.id)}
+                    className="bg-red-600 text-white px-3 py-1 rounded flex-1 hover:bg-red-700 flex items-center justify-center gap-1"
+                  >
+                    <Trash2 size={14} /> Delete
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
+        )}
+      </section>
 
-          <div className="bg-white p-8 rounded-3xl shadow-xl text-center">
-            <UserCheck className="w-12 h-12 text-green-600 mx-auto mb-4" />
-            <p className="text-gray-600 text-lg">Approved Doctors</p>
-            <p className="text-4xl font-bold text-green-600 mt-2">{approvedDoctors.length}</p>
+      {/* Approved Doctors */}
+      <section>
+        <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
+          <UserCheck size={18} /> Approved Doctors
+        </h2>
+        {approvedDoctors.length === 0 ? (
+          <p className="text-gray-500">No approved doctors</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {approvedDoctors.map((d) => (
+              <div
+                key={d.id}
+                className="bg-white p-4 rounded-xl shadow flex flex-col justify-between"
+              >
+                <div>
+                  <h3 className="font-bold text-lg">{d.name}</h3>
+                  <p className="text-gray-600">{d.specialty}</p>
+                  <p className="text-gray-600">Fee: ₹{d.fee || "N/A"}</p>
+                </div>
+                <div className="flex gap-2 mt-4">
+                  <button
+                    onClick={() => setSelectedDoctor(d)}
+                    className="bg-blue-600 text-white px-3 py-1 rounded flex-1 hover:bg-blue-700 flex items-center justify-center gap-1"
+                  >
+                    <Eye size={14} /> View
+                  </button>
+                  <button
+                    onClick={() => deleteDoctor(d.id)}
+                    className="bg-red-600 text-white px-3 py-1 rounded flex-1 hover:bg-red-700 flex items-center justify-center gap-1"
+                  >
+                    <Trash2 size={14} /> Delete
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
+        )}
+      </section>
 
-          <div className="bg-white p-8 rounded-3xl shadow-xl text-center">
-            <Users className="w-12 h-12 text-blue-600 mx-auto mb-4" /> {/* ← Now works! */}
-            <p className="text-gray-600 text-lg">Total Doctors</p>
-            <p className="text-4xl font-bold text-blue-600 mt-2">
-              {pendingDoctors.length + approvedDoctors.length}
+      {/* Doctor Modal */}
+      {selectedDoctor && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl w-full max-w-md relative shadow-lg">
+            <button
+              onClick={() => setSelectedDoctor(null)}
+              className="absolute top-3 right-3 text-gray-600 font-bold hover:text-gray-900"
+            >
+              X
+            </button>
+            <h2 className="text-2xl font-bold mb-2">{selectedDoctor.name}</h2>
+            <p>
+              <strong>Email:</strong> {selectedDoctor.email}
+            </p>
+            <p>
+              <strong>Specialty:</strong> {selectedDoctor.specialty}
+            </p>
+            <p>
+              <strong>Experience:</strong> {selectedDoctor.experience} years
+            </p>
+            <p>
+              <strong>Fee:</strong> ₹{selectedDoctor.fee}
+            </p>
+            <p>
+              <strong>Bio:</strong> {selectedDoctor.bio}
+            </p>
+            <p>
+              <strong>Approved:</strong>{" "}
+              {selectedDoctor.approved ? "Yes" : "No"}
             </p>
           </div>
         </div>
-
-        {/* Add Doctor Form */}
-        <div className="mb-16 bg-white rounded-3xl shadow-xl p-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Add New Doctor</h2>
-          <AddDoctorForm />
-        </div>
-
-        {/* View Approved Doctors Button */}
-        <div className="text-center mb-16">
-          <Link
-            href="/dashboard/admin/doctors"
-            className="inline-flex items-center gap-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-10 py-5 rounded-2xl text-xl font-bold hover:from-green-700 hover:to-emerald-700 transition shadow-xl"
-          >
-            <UserCheck className="w-8 h-8" />
-            View All Approved Doctors
-          </Link>
-        </div>
-
-        {/* Pending Doctors Section */}
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-          <div className="bg-gradient-to-r from-orange-500 to-amber-600 p-8">
-            <h2 className="text-3xl font-bold text-white flex items-center gap-4">
-              <Clock className="w-10 h-10" />
-              Pending Doctor Approvals
-            </h2>
-          </div>
-
-          <div className="p-8">
-            {error && (
-              <div className="mb-8 p-6 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-4 text-red-700">
-                <AlertCircle className="w-8 h-8" />
-                <p className="font-medium">{error}</p>
-              </div>
-            )}
-
-            {loading ? (
-              <div className="text-center py-20">
-                <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-orange-600"></div>
-                <p className="mt-6 text-xl text-gray-600">Loading doctors...</p>
-              </div>
-            ) : pendingDoctors.length === 0 ? (
-              <div className="text-center py-20">
-                <UserCheck className="w-20 h-20 text-green-600 mx-auto mb-6" />
-                <p className="text-2xl text-gray-700 font-medium">No pending approvals</p>
-                <p className="text-gray-500 mt-2">All doctors are approved!</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {pendingDoctors.map((doctor) => (
-                  <div
-                    key={doctor.id}
-                    className="bg-gradient-to-br from-amber-50 to-orange-50 p-8 rounded-2xl border-2 border-amber-200 hover:shadow-2xl transition"
-                  >
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                      Dr. {doctor.name}
-                    </h3>
-                    <p className="text-lg text-amber-700 font-medium mb-4">
-                      {doctor.specialty}
-                    </p>
-                    <div className="space-y-2 text-gray-700">
-                      <p className="text-sm">
-                        <strong>Email:</strong> {doctor.email}
-                      </p>
-                      {doctor.phone && (
-                        <p className="text-sm">
-                          <strong>Phone:</strong> {doctor.phone}
-                        </p>
-                      )}
-                      {doctor.experience && (
-                        <p className="text-sm">
-                          <strong>Experience:</strong> {doctor.experience} years
-                        </p>
-                      )}
-                    </div>
-
-                    <button
-                      onClick={() => approveDoctor(doctor.id, doctor.name)}
-                      className="mt-8 w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold py-4 rounded-xl hover:from-green-700 hover:to-emerald-700 transition shadow-lg"
-                    >
-                      Approve Doctor
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
