@@ -13,7 +13,7 @@ export default function ApproveDoctorsPage() {
             </h1>
             <Link
               href="/dashboard/admin"
-              className="mt-4 md:mt-0 text-indigo-600 hover:text-indigo-800 font-medium text-lg"
+              className="mt-4 md:mt-0  p-4 rounded-2xl border border-gray-600 text-indigo-600 hover:text-indigo-800 font-medium text-lg"
             >
               ← Back to Dashboard
             </Link>
