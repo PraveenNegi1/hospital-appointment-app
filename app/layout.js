@@ -1,17 +1,13 @@
-// app/layout.js
-import "./globals.css";
-import { AuthProvider } from "@/lib/authContext";
-
-export const metadata = {
-  title: "HealthCare",
-  description: "Hospital appointment booking platform",
-};
+import './globals.css';
+import { AuthProvider } from '../lib/authContext';
+import Navbar from '@/components/MianNavbar';
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
         <AuthProvider>
+          <Navbar />
           {children}
         </AuthProvider>
       </body>

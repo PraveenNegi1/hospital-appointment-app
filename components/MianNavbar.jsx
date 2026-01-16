@@ -6,7 +6,7 @@ import { Menu, X, HeartPulse, LogOut, User } from "lucide-react";
 import { useAuth } from "@/lib/authContext";
 import { useRouter } from "next/navigation";
 
-export default function Navbar() {
+export default function MainNavbar() {
   const [open, setOpen] = useState(false);
   const { user, loading, logout } = useAuth();
   const router = useRouter();
@@ -16,6 +16,9 @@ export default function Navbar() {
     setOpen(false);
     router.push("/auth/login");
   };
+
+  // Use displayName if available, fall back to email or "User"
+  const displayName = user?.displayName || user?.email?.split("@")[0] || "User";
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
@@ -28,10 +31,16 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden md:flex items-center gap-10">
-          <Link href="/about" className="text-gray-700 font-medium hover:text-indigo-600 transition">
+          <Link
+            href="/about"
+            className="text-gray-700 font-medium hover:text-indigo-600 transition"
+          >
             About
           </Link>
-          <Link href="/doctors" className="text-gray-700 font-medium hover:text-indigo-600 transition">
+          <Link
+            href="/doctors"
+            className="text-gray-700 font-medium hover:text-indigo-600 transition"
+          >
             Doctors
           </Link>
 
@@ -42,7 +51,7 @@ export default function Navbar() {
               <div className="flex items-center gap-3">
                 <User className="w-6 h-6 text-indigo-600" />
                 <span className="font-semibold text-gray-800">
-                  Hi, {user.name}
+                  Hi, {displayName}
                 </span>
               </div>
               <button
@@ -55,7 +64,7 @@ export default function Navbar() {
             </div>
           ) : (
             <Link
-              href="/auth/signup" 
+              href="/auth/signup"
               className="px-6 py-3 bg-indigo-600 text-white rounded-full font-semibold hover:bg-indigo-700 transition shadow-md"
             >
               Sign Up
@@ -72,6 +81,7 @@ export default function Navbar() {
         </button>
       </div>
 
+      {/* Mobile menu */}
       {open && (
         <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
           <div className="flex flex-col gap-6 px-6 py-8">
@@ -94,7 +104,9 @@ export default function Navbar() {
               <>
                 <div className="border-t border-gray-200 pt-6">
                   <p className="text-sm text-gray-600 mb-1">Signed in as</p>
-                  <p className="font-bold text-gray-900 text-lg">{user.name}</p>
+                  <p className="font-bold text-gray-900 text-lg">
+                    {displayName}
+                  </p>
                 </div>
                 <button
                   onClick={handleLogout}
