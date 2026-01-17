@@ -43,6 +43,12 @@ export default function MainNavbar() {
           >
             Doctors
           </Link>
+          <Link
+            href="/my-appointments"
+            className="text-gray-700 font-medium hover:text-indigo-600 transition"
+          >
+            My-Appointments
+          </Link>
 
           {loading ? (
             <div className="w-40 h-10 bg-gray-200 rounded-full animate-pulse" />
@@ -98,6 +104,13 @@ export default function MainNavbar() {
               className="text-gray-700 font-medium text-lg hover:text-indigo-600 transition"
             >
               Doctors
+            </Link>
+            <Link
+              href="/my-appointments"
+              onClick={() => setOpen(false)}
+              className="text-gray-700 font-medium text-lg hover:text-indigo-600 transition"
+            >
+              My-Appointments
             </Link>
 
             {user ? (

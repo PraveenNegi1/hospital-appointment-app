@@ -10,24 +10,20 @@ import {
 } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import Link from "next/link";
 
 export default function DoctorAppointmentsPage() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0] // default to today
-  );
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
         const unsubscribeQuery = fetchDoctorAppointments(user.uid);
-        return () => {
-          unsubscribeQuery();
-        };
+        return () => unsubscribeQuery();
       } else {
-        setError("Please sign in as a doctor");
+        setError("Please sign in as a doctor to view appointments");
         setLoading(false);
       }
     });
@@ -39,18 +35,12 @@ export default function DoctorAppointmentsPage() {
     setLoading(true);
     setError(null);
 
-    let q = query(
+    const q = query(
       collection(db, "appointments"),
       where("doctorId", "==", doctorUid),
       orderBy("createdAt", "desc")
     );
 
-    // Apply date filter only if a date is selected
-    if (selectedDate) {
-      q = query(q, where("date", "==", selectedDate));
-    }
-
-    // Real-time listener
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
@@ -58,12 +48,10 @@ export default function DoctorAppointmentsPage() {
           id: doc.id,
           ...doc.data(),
         }));
-        console.log(`Loaded ${data.length} appointments for ${selectedDate || "all dates"}`);
         setAppointments(data);
         setLoading(false);
       },
       (err) => {
-        console.error("Appointments query error:", err);
         setError(err.message || "Failed to load appointments");
         setLoading(false);
       }
@@ -73,137 +61,144 @@ export default function DoctorAppointmentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header + Filter */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">
-              My Appointments
-            </h1>
-            <p className="mt-3 text-xl text-gray-600">
-              View and manage incoming patient bookings
-            </p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-indigo-100 px-4 sm:px-6 lg:px-10 py-12">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
+          <div className="flex items-start gap-4">
+            <Link href="/dashboard/doctor">
+              <button className="rounded-xl bg-white/80 backdrop-blur border border-gray-200 px-5 py-3 text-gray-800 font-medium shadow hover:shadow-lg hover:bg-white transition">
+                ← Dashboard
+              </button>
+            </Link>
 
-          {/* Date Filter */}
-          <div className="w-full md:w-auto min-w-[240px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Filter by Appointment Date
-            </label>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-sm"
-            />
+            <div>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">
+                My Appointments
+              </h1>
+              <p className="mt-3 text-lg md:text-xl text-gray-600">
+                Manage all patient bookings in one place
+              </p>
+            </div>
           </div>
         </div>
 
+        {/* Loading */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-600 mb-4"></div>
-            <p className="text-xl text-gray-700">Loading appointments...</p>
+          <div className="flex flex-col items-center justify-center py-28">
+            <div className="h-16 w-16 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin mb-6" />
+            <p className="text-lg font-medium text-gray-700">
+              Fetching appointments…
+            </p>
           </div>
         ) : error ? (
-          <div className="bg-white p-10 rounded-2xl shadow-xl text-center max-w-2xl mx-auto">
-            <h2 className="text-3xl font-bold text-red-600 mb-4">Error</h2>
-            <p className="text-gray-700 text-lg mb-6">{error}</p>
+          /* Error */
+          <div className="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl p-10 text-center">
+            <h2 className="text-3xl font-bold text-red-600 mb-4">Oops!</h2>
+            <p className="text-gray-700 text-lg mb-8">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-xl font-medium transition shadow-md"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-xl font-semibold transition shadow-lg"
             >
-              Refresh Page
+              Reload Page
             </button>
           </div>
         ) : appointments.length === 0 ? (
-          <div className="bg-white p-12 rounded-2xl shadow-lg text-center max-w-3xl mx-auto">
-            <h3 className="text-2xl md:text-3xl font-semibold text-gray-700 mb-4">
-              {selectedDate
-                ? `No appointments scheduled for ${selectedDate}`
-                : "No incoming appointments yet"}
+          /* Empty State */
+          <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-lg p-14 text-center">
+            <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
+              No Appointments Yet
             </h3>
             <p className="text-lg text-gray-600">
-              {selectedDate
-                ? "Try selecting a different date or check back later."
-                : "When patients book with you, their requests will appear here in real-time."}
+              New patient bookings will appear here instantly.
             </p>
           </div>
         ) : (
-          <div className="space-y-6">
+          /* Appointments */
+          <div className="grid gap-8">
             {appointments.map((appt) => (
               <div
                 key={appt.id}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300"
+                className="bg-white rounded-3xl border border-gray-100 shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden"
               >
-                {/* Header */}
-                <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 p-6 text-white">
-                  <div className="flex justify-between items-center flex-wrap gap-4">
+                {/* Top */}
+                <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 p-6 text-white">
+                  <div className="flex flex-col md:flex-row justify-between gap-4">
                     <div>
                       <h3 className="text-2xl font-bold">
-                        {appt.patientName || "Patient"} • {appt.patientAge || "?"} yrs
+                        {appt.patientName || "Patient"}{" "}
+                        <span className="text-indigo-200 font-medium">
+                          • {appt.patientAge || "?"} yrs
+                        </span>
                       </h3>
                       <p className="mt-2 text-indigo-100 text-lg">
-                        {appt.date} at {appt.time}
+                        {appt.date} • {appt.time}
                       </p>
                     </div>
+
                     <span
-                      className={`px-5 py-2 rounded-full text-base font-medium ${
+                      className={`self-start px-5 py-2 rounded-full text-sm font-semibold tracking-wide ${
                         appt.status === "pending"
-                          ? "bg-yellow-500 text-yellow-900"
+                          ? "bg-yellow-400 text-yellow-900"
                           : appt.status === "confirmed"
-                          ? "bg-green-500 text-green-900"
+                          ? "bg-green-400 text-green-900"
                           : appt.status === "cancelled"
-                          ? "bg-red-500 text-red-900"
-                          : "bg-gray-500 text-gray-900"
+                          ? "bg-red-400 text-red-900"
+                          : "bg-gray-400 text-gray-900"
                       }`}
                     >
                       {appt.status
-                        ? appt.status.charAt(0).toUpperCase() + appt.status.slice(1)
+                        ? appt.status.charAt(0).toUpperCase() +
+                          appt.status.slice(1)
                         : "Pending"}
                     </span>
                   </div>
                 </div>
 
-                {/* Details */}
-                <div className="p-6 space-y-4 text-gray-700">
+                {/* Body */}
+                <div className="p-6 md:p-8 space-y-6 text-gray-700">
                   <div>
-                    <span className="font-semibold block mb-1">Reason for Visit:</span>
-                    <p className="text-gray-600">{appt.reason || "—"}</p>
+                    <p className="font-semibold text-gray-900 mb-1">
+                      Reason for Visit
+                    </p>
+                    <p className="text-gray-600 leading-relaxed">
+                      {appt.reason || "—"}
+                    </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="font-semibold">Phone:</span> {appt.patientPhone || "—"}
-                    </div>
-                    <div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <p>
+                      <span className="font-semibold">Phone:</span>{" "}
+                      {appt.patientPhone || "—"}
+                    </p>
+                    <p>
                       <span className="font-semibold">Email:</span>{" "}
                       {appt.patientEmail || "—"}
-                    </div>
-                    <div>
+                    </p>
+                    <p>
                       <span className="font-semibold">Gender:</span>{" "}
                       {appt.patientGender || "—"}
-                    </div>
-                    <div>
-                      <span className="font-semibold">Booked on:</span>{" "}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Booked:</span>{" "}
                       {appt.createdAt?.toDate
                         ? appt.createdAt.toDate().toLocaleString("en-IN", {
                             dateStyle: "medium",
                             timeStyle: "short",
                           })
                         : "—"}
-                    </div>
+                    </p>
                   </div>
                 </div>
 
-                {/* Actions (add logic later) */}
+                {/* Actions */}
                 {appt.status === "pending" && (
-                  <div className="p-6 pt-0 border-t bg-gray-50 flex gap-4 flex-wrap">
-                    <button className="flex-1 min-w-[140px] bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition">
-                      Confirm Appointment
+                  <div className="bg-gray-50 border-t p-6 flex flex-col sm:flex-row gap-4">
+                    <button className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition shadow">
+                      ✔ Confirm
                     </button>
-                    <button className="flex-1 min-w-[140px] bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-lg transition">
-                      Cancel / Reject
+                    <button className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-semibold transition shadow">
+                      ✖ Reject
                     </button>
                   </div>
                 )}
