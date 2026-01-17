@@ -1,3 +1,5 @@
+// app/doctor/appointments/page.jsx  (your doctor dashboard)
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -7,6 +9,8 @@ import {
   where,
   orderBy,
   onSnapshot,
+  updateDoc,
+  doc,
 } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -58,6 +62,26 @@ export default function DoctorAppointmentsPage() {
     );
 
     return unsubscribe;
+  };
+
+  // NEW: Function to confirm or reject appointment
+  const updateAppointmentStatus = async (appointmentId, newStatus) => {
+    if (!confirm(`Are you sure you want to ${newStatus === "confirmed" ? "confirm" : "reject"} this appointment?`)) {
+      return;
+    }
+
+    try {
+      await updateDoc(doc(db, "appointments", appointmentId), {
+        status: newStatus,
+        updatedAt: new Date(),
+        updatedBy: auth.currentUser?.uid || "doctor", // optional
+      });
+
+      alert(`Appointment ${newStatus === "confirmed" ? "confirmed" : "rejected"} successfully!`);
+    } catch (err) {
+      console.error("Status update error:", err);
+      alert("Failed to update status. Check permissions or network.");
+    }
   };
 
   return (
@@ -191,13 +215,19 @@ export default function DoctorAppointmentsPage() {
                   </div>
                 </div>
 
-                {/* Actions */}
+                {/* Actions - Confirm / Reject buttons */}
                 {appt.status === "pending" && (
                   <div className="bg-gray-50 border-t p-6 flex flex-col sm:flex-row gap-4">
-                    <button className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition shadow">
+                    <button
+                      onClick={() => updateAppointmentStatus(appt.id, "confirmed")}
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition shadow"
+                    >
                       ✔ Confirm
                     </button>
-                    <button className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-semibold transition shadow">
+                    <button
+                      onClick={() => updateAppointmentStatus(appt.id, "rejected")}
+                      className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-semibold transition shadow"
+                    >
                       ✖ Reject
                     </button>
                   </div>
