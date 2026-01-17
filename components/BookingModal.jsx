@@ -1,13 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  addDoc,
-  collection,
-  updateDoc,
-  doc,
-  arrayRemove,
-} from "firebase/firestore";
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
 import {
   Calendar,
@@ -25,32 +19,43 @@ export default function BookingModal({ doctor, onClose }) {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [reason, setReason] = useState("");
-  const [patientName, setPatientName] = useState(
-    auth.currentUser?.displayName || ""
-  );
-  const [patientPhone, setPatientPhone] = useState(
-    auth.currentUser?.phoneNumber || ""
-  );
+  const [patientName, setPatientName] = useState(auth.currentUser?.displayName || "");
+  const [patientPhone, setPatientPhone] = useState(auth.currentUser?.phoneNumber || "");
   const [patientEmail] = useState(auth.currentUser?.email || "");
   const [patientAge, setPatientAge] = useState("");
   const [patientGender, setPatientGender] = useState("");
   const [patientAddress, setPatientAddress] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const availableDates = doctor.availableSlots || {};
-  const slotsForDate = selectedDate ? availableDates[selectedDate] || [] : [];
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleBook = async () => {
+    setErrorMsg("");
+
+    if (!auth.currentUser) {
+      setErrorMsg("You must be logged in to book an appointment.");
+      return;
+    }
+
     if (!selectedDate || !selectedTime) {
-      alert("Please select date and time.");
+      setErrorMsg("Please select both date and time.");
       return;
     }
+
     if (!reason.trim()) {
-      alert("Please provide a reason for visit.");
+      setErrorMsg("Please enter a reason for the visit.");
       return;
     }
+
     if (!patientName.trim() || !patientPhone.trim() || !patientAge || !patientGender) {
-      alert("Please fill all required patient details.");
+      setErrorMsg("Please fill in all required patient information.");
+      return;
+    }
+
+    const doctorDocId = doctor?.uid || doctor?.id || doctor?.email;
+
+    if (!doctorDocId) {
+      setErrorMsg("Doctor information is incomplete. Cannot book.");
+      console.error("Missing doctor identifier:", doctor);
       return;
     }
 
@@ -61,12 +66,12 @@ export default function BookingModal({ doctor, onClose }) {
         patientId: auth.currentUser.uid,
         patientName: patientName.trim(),
         patientPhone: patientPhone.trim(),
-        patientEmail: patientEmail,
+        patientEmail,
         patientAge: Number(patientAge),
         patientGender,
-        patientAddress: patientAddress.trim(),
-        doctorId: doctor.email,
-        doctorName: doctor.name,
+        patientAddress: patientAddress.trim() || null,
+        doctorId: doctorDocId,
+        doctorName: doctor.name || doctor.fullName || "Doctor",
         specialty: doctor.specialty || "General Medicine",
         date: selectedDate,
         time: selectedTime,
@@ -75,15 +80,19 @@ export default function BookingModal({ doctor, onClose }) {
         createdAt: new Date(),
       });
 
-      await updateDoc(doc(db, "doctors", doctor.email), {
-        [`availableSlots.${selectedDate}`]: arrayRemove(selectedTime),
-      });
-
       alert("Appointment requested successfully! Doctor will confirm soon.");
       onClose();
     } catch (err) {
       console.error("Booking error:", err);
-      alert("Failed to book: " + err.message);
+      let message = "Failed to book appointment. Please try again.";
+
+      if (err.code === "permission-denied") {
+        message = "Permission denied – check login status or Firestore rules.";
+      } else if (err.message) {
+        message = err.message;
+      }
+
+      setErrorMsg(message);
     } finally {
       setLoading(false);
     }
@@ -105,42 +114,48 @@ export default function BookingModal({ doctor, onClose }) {
             <div className="mt-4 flex items-center justify-center gap-3">
               <Stethoscope className="w-8 h-8" />
               <div>
-                <p className="text-xl font-semibold">Dr. {doctor.name}</p>
-                <p className="text-sm opacity-90">{doctor.specialty || "General Physician"}</p>
+                <p className="text-xl font-semibold">
+                  Dr. {doctor?.name || doctor?.fullName || "Doctor"}
+                </p>
+                <p className="text-sm opacity-90">
+                  {doctor?.specialty || "General Physician"}
+                </p>
               </div>
             </div>
-            {doctor.fee > 0 && (
-              <p className="mt-3 text-lg">Consultation Fee: <span className="font-bold">₹{doctor.fee}</span></p>
+            {doctor?.fee > 0 && (
+              <p className="mt-3 text-lg">
+                Consultation Fee: <span className="font-bold">₹{doctor.fee}</span>
+              </p>
             )}
           </div>
         </div>
 
+        {errorMsg && (
+          <div className="mx-6 mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded text-red-700">
+            {errorMsg}
+          </div>
+        )}
+
         <div className="p-6 sm:p-8 space-y-6 max-h-[70vh] overflow-y-auto">
-          {/* Date & Time Selection */}
+          {/* Date & Time Selection - ADDED BACK */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-indigo-600" />
                 Select Date
               </label>
-              <select
+              <input
+                type="date"
                 value={selectedDate}
                 onChange={(e) => {
                   setSelectedDate(e.target.value);
                   setSelectedTime("");
                 }}
-                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-50"
+                min={new Date().toISOString().split("T")[0]}
+                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-gray-50 cursor-pointer"
                 disabled={loading}
-              >
-                <option value="">-- Choose Date --</option>
-                {Object.keys(availableDates)
-                  .sort()
-                  .map((date) => (
-                    <option key={date} value={date}>
-                      {date} ({availableDates[date].length} slot{availableDates[date].length !== 1 ? "s" : ""})
-                    </option>
-                  ))}
-              </select>
+                required
+              />
             </div>
 
             <div>
@@ -148,25 +163,18 @@ export default function BookingModal({ doctor, onClose }) {
                 <Clock className="w-5 h-5 text-indigo-600" />
                 Select Time
               </label>
-              <select
+              <input
+                type="time"
                 value={selectedTime}
                 onChange={(e) => setSelectedTime(e.target.value)}
-                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-gray-50"
-                disabled={!selectedDate || loading || slotsForDate.length === 0}
-              >
-                <option value="">-- Choose Time --</option>
-                {slotsForDate.map((slot) => (
-                  <option key={slot} value={slot}>
-                    {slot}
-                  </option>
-                ))}
-              </select>
-              {selectedDate && slotsForDate.length === 0 && (
-                <p className="text-red-600 text-sm mt-2">No slots available on this date</p>
-              )}
+                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-gray-50 cursor-pointer"
+                disabled={loading}
+                required
+              />
             </div>
           </div>
 
+          {/* Patient Details */}
           <div className="border-t pt-6">
             <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
               <User className="w-6 h-6 text-purple-600" />
@@ -214,8 +222,8 @@ export default function BookingModal({ doctor, onClose }) {
                   <input
                     type="email"
                     value={patientEmail}
-                    className="w-full p-4 bg-gray-100 border border-gray-300 rounded-r-xl cursor-not-allowed"
                     disabled
+                    className="w-full p-4 bg-gray-100 border border-gray-300 rounded-r-xl cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -268,6 +276,7 @@ export default function BookingModal({ doctor, onClose }) {
             </div>
           </div>
 
+          {/* Reason */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Reason for Visit *
@@ -288,7 +297,16 @@ export default function BookingModal({ doctor, onClose }) {
           <div className="flex gap-4">
             <button
               onClick={handleBook}
-              disabled={loading || !selectedTime || !patientName || !patientPhone || !patientAge || !patientGender || !reason}
+              disabled={
+                loading ||
+                !selectedDate ||
+                !selectedTime ||
+                !patientName.trim() ||
+                !patientPhone.trim() ||
+                !patientAge ||
+                !patientGender ||
+                !reason.trim()
+              }
               className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-5 rounded-2xl shadow-lg transition flex items-center justify-center gap-3 text-lg"
             >
               {loading ? (

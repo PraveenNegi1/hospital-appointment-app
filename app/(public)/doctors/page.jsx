@@ -3,12 +3,16 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import Link from "next/link";
+import BookingModal from "@/components/BookingModal"; // Adjust path as needed
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Modal state
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchApprovedDoctors = async () => {
@@ -32,6 +36,16 @@ export default function DoctorsPage() {
 
     fetchApprovedDoctors();
   }, []);
+
+  const openBookingModal = (doctor) => {
+    setSelectedDoctor(doctor);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setTimeout(() => setSelectedDoctor(null), 300);
+  };
 
   if (loading) {
     return (
@@ -95,44 +109,90 @@ export default function DoctorsPage() {
                   <h3 className="text-2xl font-bold">
                     Dr. {doctor.fullName?.split(" ").pop() || doctor.name || "Doctor"}
                   </h3>
-                  <p className="mt-2 text-indigo-100 text-lg">{doctor.specialty || "Specialist"}</p>
+                  <p className="mt-2 text-indigo-100 text-lg">
+                    {doctor.specialty || "Specialist"}
+                  </p>
                 </div>
 
-                {/* Details */}
-                <div className="p-6 flex-grow">
-                  <div className="space-y-4 text-gray-700">
+                {/* All Details */}
+                <div className="p-6 flex-grow space-y-4 text-gray-700">
+                  <p>
+                    <span className="font-semibold">Qualification:</span>{" "}
+                    {doctor.qualification || "—"}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Experience:</span>{" "}
+                    {doctor.experienceYears ? `${doctor.experienceYears} years` : "—"}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Clinic/Hospital:</span>{" "}
+                    {doctor.clinicName || doctor.hospitalName || "—"}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Consultation Fee:</span>{" "}
+                    {doctor.consultationFee || doctor.fee
+                      ? `₹${doctor.consultationFee || doctor.fee}`
+                      : "—"}
+                  </p>
+
+                  {/* Additional details - shown always */}
+                  {doctor.bio && (
                     <p>
-                      <span className="font-semibold">Qualification:</span>{" "}
-                      {doctor.qualification || "—"}
+                      <span className="font-semibold">About:</span> {doctor.bio}
                     </p>
+                  )}
+                  {doctor.languages && (
                     <p>
-                      <span className="font-semibold">Experience:</span>{" "}
-                      {doctor.experienceYears ? `${doctor.experienceYears} years` : "—"}
+                      <span className="font-semibold">Languages:</span>{" "}
+                      {Array.isArray(doctor.languages)
+                        ? doctor.languages.join(", ")
+                        : doctor.languages}
                     </p>
+                  )}
+                  {doctor.timings && (
                     <p>
-                      <span className="font-semibold">Clinic:</span>{" "}
-                      {doctor.clinicName || "—"}
+                      <span className="font-semibold">Timings:</span> {doctor.timings}
                     </p>
+                  )}
+                  {doctor.hospitalAddress && (
                     <p>
-                      <span className="font-semibold">Fee:</span>{" "}
-                      {doctor.consultationFee ? `₹${doctor.consultationFee}` : "—"}
+                      <span className="font-semibold">Location:</span>{" "}
+                      {doctor.hospitalAddress}
                     </p>
-                  </div>
+                  )}
+                  {doctor.achievements && (
+                    <p>
+                      <span className="font-semibold">Achievements:</span>{" "}
+                      {doctor.achievements}
+                    </p>
+                  )}
                 </div>
 
-                {/* Footer with button */}
+                {/* Footer with Book Appointment button */}
                 <div className="p-6 pt-0 border-t border-gray-100 bg-gray-50">
-                  <Link href={`/doctors/${doctor.slug}`}>
-                    <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">
-                      View Profile & Book
-                    </button>
-                  </Link>
+                  <button
+                    onClick={() => openBookingModal(doctor)}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+                  >
+                    Book Appointment
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Booking Modal */}
+      {isModalOpen && selectedDoctor && (
+<BookingModal
+        doctor={{
+          ...selectedDoctor,          
+          uid: selectedDoctor.id,      
+          // id: selectedDoctor.id,   
+        }}
+        onClose={closeModal}
+      />     )}
     </div>
   );
 }
