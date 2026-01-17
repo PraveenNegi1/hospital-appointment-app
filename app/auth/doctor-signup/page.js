@@ -1,4 +1,5 @@
 // app/auth/doctor-signup/page.jsx
+
 "use client";
 
 import { useState } from "react";
@@ -11,16 +12,48 @@ export default function DoctorSignup() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [specialty, setSpecialty] = useState("");
+  const [specialty, setSpecialty] = useState(""); // now selected from dropdown
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
+  // List of common medical specialties (you can add/remove as needed)
+  const specialties = [
+    "General Medicine",
+    "Cardiology",
+    "Neurology",
+    "Dermatology",
+    "Pediatrics",
+    "Orthopedics",
+    "Gynecology",
+    "ENT (Otolaryngology)",
+    "Gastroenterology",
+    "Endocrinology",
+    "Pulmonology",
+    "Ophthalmology",
+    "Psychiatry",
+    "Urology",
+    "Oncology",
+    "Radiology",
+    "Anesthesiology",
+    "Dentistry",
+    "Physiotherapy",
+    "Ayurveda",
+    "Homeopathy",
+    "Other",
+  ];
+
   const handleSignup = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    if (!specialty) {
+      setError("Please select a specialty.");
+      setLoading(false);
+      return;
+    }
 
     try {
       // 1. Create Firebase Auth account
@@ -44,8 +77,8 @@ export default function DoctorSignup() {
         uid: user.uid,
         fullName: fullName.trim(),
         email: email.trim(),
-        specialty: specialty.trim(),
-        status: "pending", // you can change to "approved" if you auto-approve
+        specialty: specialty, // now comes from dropdown
+        status: "pending", // or "approved" if auto-approve
         createdAt: new Date().toISOString(),
       });
 
@@ -149,23 +182,30 @@ export default function DoctorSignup() {
                 </p>
               </div>
 
-              {/* Specialty */}
+              {/* Specialty - Dropdown */}
               <div>
                 <label
                   htmlFor="specialty"
                   className="block text-sm font-medium text-gray-700 mb-1.5"
                 >
-                  Specialty / Profession
+                  Specialty / Profession *
                 </label>
-                <input
+                <select
                   id="specialty"
-                  type="text"
                   value={specialty}
                   onChange={(e) => setSpecialty(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                  placeholder="Cardiology, Pediatrics, General Medicine..."
-                />
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-white"
+                >
+                  <option value="" disabled>
+                    Select your specialty
+                  </option>
+                  {specialties.map((spec) => (
+                    <option key={spec} value={spec}>
+                      {spec}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Error */}
