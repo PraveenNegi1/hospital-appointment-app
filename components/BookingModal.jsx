@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
 import {
   Calendar,
@@ -99,9 +99,9 @@ export default function BookingModal({ doctor, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full my-8">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-3xl p-6 text-white relative">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center  p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full h-[97vh] my-8 sm:mx-4">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-2xl p-6 text-white relative">
           <button
             onClick={onClose}
             disabled={loading}
@@ -110,11 +110,11 @@ export default function BookingModal({ doctor, onClose }) {
             <X className="w-6 h-6" />
           </button>
           <div className="text-center">
-            <h2 className="text-3xl font-bold">Book Appointment</h2>
-            <div className="mt-4 flex items-center justify-center gap-3">
+            <h2 className="text-2xl  font-bold">Book Appointment</h2>
+            <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Stethoscope className="w-8 h-8" />
               <div>
-                <p className="text-xl font-semibold">
+                <p className="text-lg sm:text-xl font-semibold">
                   Dr. {doctor?.name || doctor?.fullName || "Doctor"}
                 </p>
                 <p className="text-sm opacity-90">
@@ -137,8 +137,8 @@ export default function BookingModal({ doctor, onClose }) {
         )}
 
         <div className="p-6 sm:p-8 space-y-6 max-h-[70vh] overflow-y-auto">
-          {/* Date & Time Selection - ADDED BACK */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* Date & Time */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-indigo-600" />
@@ -181,7 +181,7 @@ export default function BookingModal({ doctor, onClose }) {
               Patient Details
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
                 <input
@@ -259,7 +259,7 @@ export default function BookingModal({ doctor, onClose }) {
                 </select>
               </div>
 
-              <div className="md:col-span-2">
+              <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-indigo-600" />
                   Address (Optional)
@@ -294,7 +294,7 @@ export default function BookingModal({ doctor, onClose }) {
         </div>
 
         <div className="p-6 sm:p-8 border-t bg-gray-50 rounded-b-3xl">
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={handleBook}
               disabled={
@@ -315,13 +315,13 @@ export default function BookingModal({ doctor, onClose }) {
                   Booking...
                 </>
               ) : (
-                "Confirm & Request Appointment"
+                "Book Appointment"
               )}
             </button>
             <button
               onClick={onClose}
               disabled={loading}
-              className="px-8 py-5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-2xl transition"
+              className="px-8 py-5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-2xl transition flex-1"
             >
               Cancel
             </button>
