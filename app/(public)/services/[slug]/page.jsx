@@ -84,7 +84,7 @@ export default function ServiceDoctorsPage() {
   const Icon = service.icon;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 font-serif">
       {/* Hero Section */}
       <section className="relative py-20 md:py-28 px-4 overflow-hidden">
         <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-indigo-200/30 rounded-full blur-3xl animate-pulse"></div>
@@ -94,10 +94,10 @@ export default function ServiceDoctorsPage() {
           <div className="inline-flex items-center justify-center w-28 h-28 bg-gradient-to-br from-indigo-300 via-purple-400 to-pink-300 rounded-full mb-8 shadow-xl transform hover:scale-105 transition-all duration-500">
             <Icon className="w-14 h-14 text-white" />
           </div>
-          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 animate-fadeIn">
+          <h1 className="text-4xl  font-extrabold text-gray-900 mb-6 animate-fadeIn">
             {service.title}
           </h1>
-          <p className="text-lg md:text-2xl text-gray-700 max-w-3xl mx-auto animate-fadeIn delay-200">
+          <p className="text-lg  text-gray-700 max-w-3xl mx-auto animate-fadeIn delay-200">
             {service.shortDesc}
           </p>
 

@@ -14,15 +14,15 @@ import Link from "next/link";
 
 export default function AboutPage() {
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen font-serif">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white py-20 md:py-28 overflow-hidden">
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
+          <h1 className="text-4xl  font-extrabold mb-6 leading-tight">
             Transforming Healthcare Access
             <br />
-            <span className="text-indigo-200">One Appointment at a Time</span>
+            <span className="text-white">One Appointment at a Time</span>
           </h1>
           <p className="text-lg md:text-xl max-w-4xl mx-auto opacity-95 leading-relaxed">
             We are a next-generation digital healthcare platform dedicated to
@@ -276,10 +276,11 @@ export default function AboutPage() {
                 Find a Doctor Now
               </button>
             </Link>
-
-            <button className="border-2 border-indigo-600 text-indigo-600 cursor-pointer px-8 py-4 rounded-xl font-semibold text-lg hover:bg-indigo-50 transition w-full sm:w-auto">
-              For Doctors → Join Us
-            </button>
+            <Link href="/auth/doctor-signup" className="inline-block">
+              <button className="border-2 border-indigo-600 text-indigo-600 cursor-pointer px-8 py-4 rounded-xl font-semibold text-lg hover:bg-indigo-50 transition w-full sm:w-auto">
+                For Doctors → Join Us
+              </button>
+            </Link>
           </div>
         </div>
       </section>
