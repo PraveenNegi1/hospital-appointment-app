@@ -85,7 +85,7 @@ export default function DoctorAppointmentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-indigo-100 px-4 sm:px-6 lg:px-10 py-12">
+    <div className="min-h-screen font-serif bg-gradient-to-br from-indigo-50 via-white to-indigo-100 px-4 sm:px-6 lg:px-10 py-12">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">

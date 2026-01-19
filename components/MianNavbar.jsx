@@ -21,7 +21,7 @@ export default function MainNavbar() {
   const displayName = user?.displayName || user?.email?.split("@")[0] || "User";
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
+    <nav className="sticky top-0 z-50 font-serif bg-white/80 backdrop-blur-md border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <HeartPulse className="w-8 h-8 text-indigo-600" />

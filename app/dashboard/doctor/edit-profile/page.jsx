@@ -100,7 +100,7 @@ export default function EditDoctorProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen font-serif bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto bg-white p-8 md:p-10 rounded-2xl shadow-xl border border-gray-100">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
           Edit Your Doctor Profile
