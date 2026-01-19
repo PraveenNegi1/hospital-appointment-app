@@ -8,9 +8,7 @@ export default function HospitalHero() {
   return (
     <section className="bg-gray-50 py-12 md:py-20 px-4 sm:px-6 font-serif">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-        {/* ================= Left Content ================= */}
         <div>
-      
           <h1 className="text-3xl  font-bold leading-tight text-gray-900">
             Caring for Life, <br className="hidden sm:block" /> Healing with
             Heart
@@ -21,7 +19,6 @@ export default function HospitalHero() {
             facilities, compassionate treatment, and patient-first approach.
           </p>
 
-          {/* Features */}
           <ul className="mt-6 space-y-3 text-gray-700">
             <li className="flex items-center gap-2">
               <CheckCircle className="text-blue-600 w-5 h-5" />
@@ -37,7 +34,6 @@ export default function HospitalHero() {
             </li>
           </ul>
 
-          {/* CTA Buttons */}
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <Link
               href="/doctors"
@@ -51,7 +47,6 @@ export default function HospitalHero() {
             </button>
           </div>
 
-          {/* Trust Stats */}
           <div className="mt-10 grid grid-cols-3 gap-6 text-center sm:text-left">
             <Stat value="5+" label="Departments" />
             <Stat value="10+" label="Doctors" />
@@ -59,7 +54,6 @@ export default function HospitalHero() {
           </div>
         </div>
 
-        {/* ================= Right Image ================= */}
         <div className="relative w-full aspect-[4/3] md:aspect-[16/10] rounded-3xl overflow-hidden shadow-xl">
           <Image
             src="/herobanner.jpg"
@@ -73,8 +67,6 @@ export default function HospitalHero() {
     </section>
   );
 }
-
-/* ================= Small Component ================= */
 
 function Stat({ value, label }) {
   return (
