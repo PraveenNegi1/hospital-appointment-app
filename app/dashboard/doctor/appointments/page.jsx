@@ -1,5 +1,3 @@
-// app/doctor/appointments/page.jsx  (your doctor dashboard)
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -42,7 +40,7 @@ export default function DoctorAppointmentsPage() {
     const q = query(
       collection(db, "appointments"),
       where("doctorId", "==", doctorUid),
-      orderBy("createdAt", "desc")
+      orderBy("createdAt", "desc"),
     );
 
     const unsubscribe = onSnapshot(
@@ -58,15 +56,18 @@ export default function DoctorAppointmentsPage() {
       (err) => {
         setError(err.message || "Failed to load appointments");
         setLoading(false);
-      }
+      },
     );
 
     return unsubscribe;
   };
 
-  // NEW: Function to confirm or reject appointment
   const updateAppointmentStatus = async (appointmentId, newStatus) => {
-    if (!confirm(`Are you sure you want to ${newStatus === "confirmed" ? "confirm" : "reject"} this appointment?`)) {
+    if (
+      !confirm(
+        `Are you sure you want to ${newStatus === "confirmed" ? "confirm" : "reject"} this appointment?`,
+      )
+    ) {
       return;
     }
 
@@ -77,7 +78,9 @@ export default function DoctorAppointmentsPage() {
         updatedBy: auth.currentUser?.uid || "doctor", // optional
       });
 
-      alert(`Appointment ${newStatus === "confirmed" ? "confirmed" : "rejected"} successfully!`);
+      alert(
+        `Appointment ${newStatus === "confirmed" ? "confirmed" : "rejected"} successfully!`,
+      );
     } catch (err) {
       console.error("Status update error:", err);
       alert("Failed to update status. Check permissions or network.");
@@ -87,7 +90,6 @@ export default function DoctorAppointmentsPage() {
   return (
     <div className="min-h-screen font-serif bg-gradient-to-br from-indigo-50 via-white to-indigo-100 px-4 sm:px-6 lg:px-10 py-12">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
           <div className="flex items-start gap-4">
             <Link href="/dashboard/doctor">
@@ -107,7 +109,6 @@ export default function DoctorAppointmentsPage() {
           </div>
         </div>
 
-        {/* Loading */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-28">
             <div className="h-16 w-16 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin mb-6" />
@@ -128,7 +129,6 @@ export default function DoctorAppointmentsPage() {
             </button>
           </div>
         ) : appointments.length === 0 ? (
-          /* Empty State */
           <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-lg p-14 text-center">
             <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
               No Appointments Yet
@@ -138,7 +138,6 @@ export default function DoctorAppointmentsPage() {
             </p>
           </div>
         ) : (
-          /* Appointments */
           <div className="grid gap-8">
             {appointments.map((appt) => (
               <div
@@ -165,10 +164,10 @@ export default function DoctorAppointmentsPage() {
                         appt.status === "pending"
                           ? "bg-yellow-400 text-yellow-900"
                           : appt.status === "confirmed"
-                          ? "bg-green-400 text-green-900"
-                          : appt.status === "cancelled"
-                          ? "bg-red-400 text-red-900"
-                          : "bg-gray-400 text-gray-900"
+                            ? "bg-green-400 text-green-900"
+                            : appt.status === "cancelled"
+                              ? "bg-red-400 text-red-900"
+                              : "bg-gray-400 text-gray-900"
                       }`}
                     >
                       {appt.status
@@ -219,13 +218,17 @@ export default function DoctorAppointmentsPage() {
                 {appt.status === "pending" && (
                   <div className="bg-gray-50 border-t p-6 flex flex-col sm:flex-row gap-4">
                     <button
-                      onClick={() => updateAppointmentStatus(appt.id, "confirmed")}
+                      onClick={() =>
+                        updateAppointmentStatus(appt.id, "confirmed")
+                      }
                       className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition shadow"
                     >
                       ✔ Confirm
                     </button>
                     <button
-                      onClick={() => updateAppointmentStatus(appt.id, "rejected")}
+                      onClick={() =>
+                        updateAppointmentStatus(appt.id, "rejected")
+                      }
                       className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-semibold transition shadow"
                     >
                       ✖ Reject
