@@ -3,11 +3,9 @@
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 
-// ✅ IMPORTANT: correct import
 import { servicesData } from "@/app/(public)/services/data";
 
 export default function Services() {
-  // Take only the first 4 services
   const displayedServices = servicesData.slice(0, 4);
 
   return (
