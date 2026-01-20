@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "browser-image-compression": "^2.0.2",
     "chart.js": "^4.5.1",
     "date-fns": "^4.1.0",
     "firebase": "^12.7.0",
