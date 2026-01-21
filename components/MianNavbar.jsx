@@ -86,7 +86,6 @@ export default function MainNavbar() {
         </button>
       </div>
 
-      {/* Mobile menu */}
       {open && (
         <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
           <div className="flex flex-col gap-6 px-6 py-8">

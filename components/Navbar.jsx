@@ -44,7 +44,6 @@ export default function DashboardNavbar() {
           <span className="text-2xl font-extrabold">HospitalApp</span>
         </Link>
 
-        {/* Right Side */}
         <div className="flex items-center gap-6">
           {user ? (
             <>
@@ -54,7 +53,6 @@ export default function DashboardNavbar() {
                 <span className="font-medium text-lg">Hi, {userName}</span>
               </div>
 
-              {/* Logout Button */}
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-5 py-2.5 rounded-lg font-semibold transition shadow-md"
