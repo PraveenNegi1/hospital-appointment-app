@@ -76,7 +76,6 @@ export default function HospitalTests() {
                          shadow-md hover:shadow-xl transition-all duration-300
                          hover:-translate-y-2"
             >
-              {/* Icon */}
               <div
                 className="mx-auto mb-5 w-16 h-16 flex items-center justify-center
                            rounded-full bg-blue-100 text-blue-600 text-2xl
@@ -96,7 +95,6 @@ export default function HospitalTests() {
           ))}
         </div>
 
-        {/* CTA Button */}
         <div className="mt-16 text-center">
           <Link
             href="/tests"
