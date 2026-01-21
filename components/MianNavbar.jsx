@@ -17,7 +17,6 @@ export default function MainNavbar() {
     router.push("/auth/login");
   };
 
-  // Use displayName if available, fall back to email or "User"
   const displayName = user?.displayName || user?.email?.split("@")[0] || "User";
 
   return (
