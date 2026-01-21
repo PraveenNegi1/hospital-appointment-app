@@ -16,7 +16,6 @@ export default function DashboardNavbar() {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        // Get name from localStorage (set on login/signup)
         const name = localStorage.getItem("userName") || currentUser.email.split("@")[0];
         setUserName(name);
       } else {
@@ -47,7 +46,6 @@ export default function DashboardNavbar() {
         <div className="flex items-center gap-6">
           {user ? (
             <>
-              {/* User Greeting */}
               <div className="flex items-center gap-3">
                 <User className="w-6 h-6" />
                 <span className="font-medium text-lg">Hi, {userName}</span>
