@@ -36,7 +36,7 @@ export default function MainNavbar() {
       <nav className="sticky top-0 z-50 font-serif bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           {/* Logo */}
-          
+
           <Link href="/" className="flex items-center gap-2.5">
             <HeartPulse className="w-8 h-8 text-indigo-600" />
             <span className="text-2xl font-extrabold text-gray-900">
@@ -81,7 +81,6 @@ export default function MainNavbar() {
             )}
           </div>
 
-          {/* Mobile Hamburger */}
           <button
             className="md:hidden text-gray-700 focus:outline-none"
             onClick={() => setIsOpen(true)}
@@ -92,19 +91,16 @@ export default function MainNavbar() {
         </div>
       </nav>
 
-      {/* Mobile Sidebar (Drawer) */}
       <div
         className={`fixed inset-0 z-50 transition-opacity duration-300 ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
-        {/* Backdrop */}
         <div
           className="absolute inset-0 bg-black/50 backdrop-blur-sm"
           onClick={closeMenu}
         />
 
-        {/* Sidebar Panel */}
         <div
           className={`absolute top-0 left-0 h-full w-4/5 max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${
             isOpen ? "translate-x-0" : "-translate-x-full"
@@ -203,7 +199,6 @@ function NavLink({ href, label }) {
   );
 }
 
-// Reusable Mobile NavLink
 function MobileNavLink({ href, label, icon: Icon, onClick }) {
   return (
     <Link
