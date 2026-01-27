@@ -33,7 +33,6 @@ export default function MainNavbar() {
 
   return (
     <>
-      {/* Main Navbar */}
       <nav className="sticky top-0 z-50 font-serif bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           {/* Logo */}
@@ -192,7 +191,6 @@ export default function MainNavbar() {
   );
 }
 
-// Reusable NavLink for desktop
 function NavLink({ href, label }) {
   return (
     <Link
