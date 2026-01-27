@@ -265,8 +265,8 @@ export default function AdminDashboard() {
         {/* Main Content */}
         <main className="flex-1 p-6 lg:p-10">
           <div className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-              Welcome, {adminName} 👋
+            <h1 className="text-3xl font-serif  font-extrabold text-transparent bg-clip-text bg-indigo-600">
+              Welcome, {adminName} 
             </h1>
             <p className="mt-3 text-lg text-gray-600">
               Here's your complete platform overview
