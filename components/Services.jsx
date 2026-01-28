@@ -42,12 +42,10 @@ export default function Services() {
                   {service.title}
                 </h3>
 
-                {/* Description */}
                 <p className="mt-2 text-gray-600 text-sm md:text-base">
                   {service.shortDesc}
                 </p>
 
-                {/* Highlights */}
                 <ul className="mt-4 space-y-2 text-sm text-gray-600 flex-1">
                   {service.points.slice(0, 3).map((point, i) => (
                     <li key={i} className="flex items-center gap-2">
