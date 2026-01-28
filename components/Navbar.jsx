@@ -35,7 +35,6 @@ export default function DashboardNavbar() {
   return (
     <nav className="bg-gradient-to-r from-teal-600 to-blue-700 text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-3">
           <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
             <span className="text-2xl font-bold">H</span>

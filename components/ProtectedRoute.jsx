@@ -38,6 +38,5 @@ export default function ProtectedRoute({ children, allowedRoles }) {
     return null;
   }
 
-  // All checks passed → render children
   return <>{children}</>;
 }
