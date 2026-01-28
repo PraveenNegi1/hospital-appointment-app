@@ -13,7 +13,6 @@ export default function ProtectedRoute({ children, allowedRoles }) {
       if (!user) {
         router.replace('/auth/login');
       } else if (role && !allowedRoles.includes(role)) {
-        // Logged in, but wrong role → redirect to home
         router.replace('/');
       }
     }
