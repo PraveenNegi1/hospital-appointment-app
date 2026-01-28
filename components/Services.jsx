@@ -22,7 +22,6 @@ export default function Services() {
           </p>
         </div>
 
-        {/* Services Grid - Only 4 cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {displayedServices.map((service) => {
             const Icon = service.icon;
@@ -32,12 +31,10 @@ export default function Services() {
                 key={service.slug}
                 className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition flex flex-col"
               >
-                {/* Icon */}
                 <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
                   <Icon className="text-blue-600 w-6 h-6" />
                 </div>
 
-                {/* Title */}
                 <h3 className="text-lg md:text-xl font-semibold text-gray-900">
                   {service.title}
                 </h3>
@@ -55,7 +52,6 @@ export default function Services() {
                   ))}
                 </ul>
 
-                {/* CTA */}
                 <Link
                   href={`/services/${service.slug}`}
                   className="mt-6 text-blue-600 font-semibold hover:text-blue-700"
