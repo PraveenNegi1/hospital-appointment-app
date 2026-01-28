@@ -9,7 +9,6 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Only run redirect logic after auth state has finished loading
     if (!loading) {
       if (!user) {
         router.replace('/auth/login');
