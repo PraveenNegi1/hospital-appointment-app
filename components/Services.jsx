@@ -62,7 +62,6 @@ export default function Services() {
           })}
         </div>
 
-        {/* Bottom CTA */}
         <div className="mt-12 text-center">
           <Link
             href="/services"
