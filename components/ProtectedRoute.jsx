@@ -12,7 +12,6 @@ export default function ProtectedRoute({ children, allowedRoles }) {
     // Only run redirect logic after auth state has finished loading
     if (!loading) {
       if (!user) {
-        // Not logged in → redirect to login
         router.replace('/auth/login');
       } else if (role && !allowedRoles.includes(role)) {
         // Logged in, but wrong role → redirect to home
@@ -21,7 +20,6 @@ export default function ProtectedRoute({ children, allowedRoles }) {
     }
   }, [loading, user, role, router, allowedRoles]);
 
-  // While loading auth state → show loading UI
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -33,7 +31,6 @@ export default function ProtectedRoute({ children, allowedRoles }) {
     );
   }
 
-  // Not authenticated or wrong role → show nothing (redirect is already happening)
   if (!user || (role && !allowedRoles.includes(role))) {
     return null;
   }
