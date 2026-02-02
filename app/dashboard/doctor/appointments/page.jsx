@@ -227,7 +227,9 @@ export default function DoctorAppointmentsDashboard() {
                         <ClockIcon className="h-4.5 w-4.5" />
                         {formatTime(appt.time)}
                       </div> 
-                      <p className="text-[16px] font-medium font-serif"> Booked slot </p>
+<p className="text-[14px] font-medium font-serif text-green-700 bg-green-100 px-3 py-1 rounded-full inline-block">
+  Booked Slot
+</p>
                       {appt.patientLocation && (
                         <div className="flex items-center gap-1.5">
                           <MapPinIcon className="h-4.5 w-4.5" />
