@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "browser-image-compression": "^2.0.2",
     "chart.js": "^4.5.1",
     "date-fns": "^4.1.0",
