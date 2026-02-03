@@ -162,7 +162,6 @@ export default function DoctorAppointmentsDashboard() {
   return (
     <div className="min-h-screen font-serif bg-gradient-to-br from-gray-50 via-white to-indigo-50/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
           <div>
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
