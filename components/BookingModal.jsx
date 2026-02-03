@@ -173,7 +173,6 @@ export default function BookingModal({ doctor, onClose }) {
             </div>
           </div>
 
-          {/* Patient Details */}
           <div className="border-t pt-6">
             <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
               <User className="w-6 h-6 text-purple-600" />
