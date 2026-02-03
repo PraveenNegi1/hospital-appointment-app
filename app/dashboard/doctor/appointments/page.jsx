@@ -52,7 +52,7 @@ export default function DoctorAppointmentsDashboard() {
     const q = query(
       collection(db, "appointments"),
       where("doctorId", "==", doctorUid),
-      orderBy("createdAt", "desc")
+      orderBy("createdAt", "desc"),
     );
 
     return onSnapshot(
@@ -69,12 +69,13 @@ export default function DoctorAppointmentsDashboard() {
         console.error(err);
         setError("Failed to load appointments. Please try again.");
         setLoading(false);
-      }
+      },
     );
   };
 
   const updateStatus = async (id, newStatus) => {
-    if (!confirm(`Are you sure you want to ${newStatus} this appointment?`)) return;
+    if (!confirm(`Are you sure you want to ${newStatus} this appointment?`))
+      return;
 
     try {
       await updateDoc(doc(db, "appointments", id), {
@@ -95,11 +96,11 @@ export default function DoctorAppointmentsDashboard() {
     return isNaN(date)
       ? "—"
       : date.toLocaleDateString("en-IN", {
-        weekday: "short",
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      });
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
   };
 
   const formatTime = (value) => value || "—";
@@ -146,7 +147,9 @@ export default function DoctorAppointmentsDashboard() {
       <div className="min-h-screen font-serif bg-gray-50/50 flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
           <div className="text-rose-600 text-5xl mb-4">!</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-3">Something went wrong</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-3">
+            Something went wrong
+          </h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
@@ -197,7 +200,8 @@ export default function DoctorAppointmentsDashboard() {
               No appointments yet
             </h3>
             <p className="text-gray-600 max-w-md mx-auto">
-              When patients book with you, their appointments will appear here in real time.
+              When patients book with you, their appointments will appear here
+              in real time.
             </p>
           </div>
         ) : (
@@ -224,10 +228,10 @@ export default function DoctorAppointmentsDashboard() {
                       <div className="flex items-center gap-1.5">
                         <ClockIcon className="h-4.5 w-4.5" />
                         {formatTime(appt.time)}
-                      </div> 
-<p className="text-[14px] font-medium font-serif text-green-700 bg-green-100 px-3 py-1 rounded-full inline-block">
-  Booked Slot
-</p>
+                      </div>
+                      <p className="text-[14px] font-medium font-serif text-green-700 bg-green-100 px-3 py-1 rounded-full inline-block">
+                        Booked Slot
+                      </p>
                       {appt.patientLocation && (
                         <div className="flex items-center gap-1.5">
                           <MapPinIcon className="h-4.5 w-4.5" />
@@ -239,11 +243,12 @@ export default function DoctorAppointmentsDashboard() {
 
                   <div
                     className={`px-5 py-1.5 rounded-full text-sm font-medium border ${getStatusStyle(
-                      appt.status
+                      appt.status,
                     )}`}
                   >
                     {appt.status
-                      ? appt.status.charAt(0).toUpperCase() + appt.status.slice(1)
+                      ? appt.status.charAt(0).toUpperCase() +
+                        appt.status.slice(1)
                       : "Pending"}
                   </div>
                 </div>
@@ -262,7 +267,9 @@ export default function DoctorAppointmentsDashboard() {
                   <div className="space-y-3 text-sm">
                     <div className="flex items-center gap-3">
                       <PhoneIcon className="h-5 w-5 text-gray-500 flex-shrink-0" />
-                      <span className="text-gray-800">{appt.patientPhone || "—"}</span>
+                      <span className="text-gray-800">
+                        {appt.patientPhone || "—"}
+                      </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <EnvelopeIcon className="h-5 w-5 text-gray-500 flex-shrink-0" />
@@ -272,7 +279,9 @@ export default function DoctorAppointmentsDashboard() {
                     </div>
                     <div className="flex items-center gap-3">
                       <UserIcon className="h-5 w-5 text-gray-500 flex-shrink-0" />
-                      <span className="text-gray-800">{appt.patientGender || "—"}</span>
+                      <span className="text-gray-800">
+                        {appt.patientGender || "—"}
+                      </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <ClockIcon className="h-5 w-5 text-gray-500 flex-shrink-0" />
