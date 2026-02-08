@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/authContext";
 import { useRouter } from "next/navigation";
+import NotificationBell from "@/components/NotificationBell"; // ← adjust path if needed
 
 export default function MainNavbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -52,6 +53,8 @@ export default function MainNavbar() {
               <div className="w-40 h-10 bg-gray-200 rounded-full animate-pulse" />
             ) : user ? (
               <div className="flex items-center gap-6">
+                <NotificationBell /> {/* ← Added here for desktop */}
+
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
                     <User className="w-5 h-5 text-indigo-600" />
@@ -60,6 +63,7 @@ export default function MainNavbar() {
                     Hi, {displayName}
                   </span>
                 </div>
+
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-2 px-4 py-2 text-red-600 hover:text-red-700 font-medium transition"
@@ -88,6 +92,7 @@ export default function MainNavbar() {
         </div>
       </nav>
 
+      {/* Mobile Menu */}
       <div
         className={`fixed inset-0 z-50 transition-opacity duration-300 ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -158,6 +163,11 @@ export default function MainNavbar() {
                       </p>
                       <p className="text-sm text-gray-600">Signed in</p>
                     </div>
+                  </div>
+
+                  {/* Notification bell in mobile menu */}
+                  <div className="px-4 py-3 mb-4">
+                    <NotificationBell />
                   </div>
 
                   <button

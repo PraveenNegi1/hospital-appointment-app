@@ -10,6 +10,8 @@ import {
   updateDoc,
   doc,
   Timestamp,
+  getDoc,
+  addDoc,
 } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -34,6 +36,7 @@ export default function DoctorAppointmentsDashboard() {
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
+        console.log("Doctor logged in → UID:", user.uid);
         const unsubscribeQuery = fetchAppointments(user.uid);
         return () => unsubscribeQuery();
       } else {
@@ -52,7 +55,7 @@ export default function DoctorAppointmentsDashboard() {
     const q = query(
       collection(db, "appointments"),
       where("doctorId", "==", doctorUid),
-      orderBy("createdAt", "desc"),
+      orderBy("createdAt", "desc")
     );
 
     return onSnapshot(
@@ -62,38 +65,74 @@ export default function DoctorAppointmentsDashboard() {
           id: doc.id,
           ...doc.data(),
         }));
+        console.log(`Loaded ${data.length} appointment(s)`);
         setAppointments(data);
         setLoading(false);
       },
       (err) => {
-        console.error(err);
+        console.error("Firestore error:", err);
         setError("Failed to load appointments. Please try again.");
         setLoading(false);
-      },
+      }
     );
   };
 
   const updateStatus = async (id, newStatus) => {
-    if (!confirm(`Are you sure you want to ${newStatus} this appointment?`))
+    if (!confirm(`Are you sure you want to ${newStatus} this appointment?`)) {
       return;
+    }
 
     try {
-      await updateDoc(doc(db, "appointments", id), {
+      const appointmentRef = doc(db, "appointments", id);
+      const apptSnap = await getDoc(appointmentRef);
+
+      if (!apptSnap.exists()) {
+        alert("Appointment not found");
+        return;
+      }
+
+      const apptData = apptSnap.data();
+
+      // Update status
+      await updateDoc(appointmentRef, {
         status: newStatus,
         updatedAt: Timestamp.now(),
         updatedBy: auth.currentUser?.uid || "system",
       });
+
+      // Send notification to patient when confirmed
+      if (newStatus.toLowerCase() === "confirmed") {
+        if (!apptData.patientId) {
+          console.warn("No patientId found → notification not sent");
+        } else {
+          await addDoc(collection(db, "notifications"), {
+            userId: apptData.patientId,
+            type: "appointment_confirmed",
+            appointmentId: id,
+            doctorName: apptData.doctorName || "Doctor",
+            patientName: apptData.patientName || "Patient",
+            date: formatDate(apptData.date),
+            time: formatTime(apptData.time),
+            message: `Your appointment has been CONFIRMED!\n\nDoctor: ${apptData.doctorName || "Your Doctor"}\nDate: ${formatDate(apptData.date)}\nTime: ${formatTime(apptData.time)}`,
+            createdAt: Timestamp.now(),
+            isRead: false,
+          });
+          console.log("Notification created for patient:", apptData.patientId);
+        }
+      }
+
+      alert(`Appointment marked as ${newStatus}!`);
     } catch (err) {
-      console.error(err);
-      alert("Failed to update appointment status");
+      console.error("Error updating status:", err);
+      alert("Failed to update appointment status\n" + err.message);
     }
   };
 
-  // Formatters
+  // ─────────────── Formatters ───────────────
   const formatDate = (value) => {
     if (!value) return "—";
     const date = value?.toDate ? value.toDate() : new Date(value);
-    return isNaN(date)
+    return isNaN(date.getTime())
       ? "—"
       : date.toLocaleDateString("en-IN", {
           weekday: "short",
@@ -131,6 +170,7 @@ export default function DoctorAppointmentsDashboard() {
     }
   };
 
+  // ─────────────── Render ───────────────
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
@@ -243,7 +283,7 @@ export default function DoctorAppointmentsDashboard() {
 
                   <div
                     className={`px-5 py-1.5 rounded-full text-sm font-medium border ${getStatusStyle(
-                      appt.status,
+                      appt.status
                     )}`}
                   >
                     {appt.status
@@ -253,7 +293,6 @@ export default function DoctorAppointmentsDashboard() {
                   </div>
                 </div>
 
-                {/* Content */}
                 <div className="p-6 lg:p-7 grid md:grid-cols-2 gap-6">
                   <div>
                     <div className="text-sm font-semibold text-gray-700 mb-1.5">
@@ -292,7 +331,6 @@ export default function DoctorAppointmentsDashboard() {
                   </div>
                 </div>
 
-                {/* Actions */}
                 {appt.status?.toLowerCase() === "pending" && (
                   <div className="border-t bg-gray-50/70 px-6 py-5 flex gap-4">
                     <button
