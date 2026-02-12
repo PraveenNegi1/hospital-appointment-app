@@ -305,25 +305,25 @@ export default function DoctorAppointmentsDashboard() {
 
                   <div className="space-y-3 text-sm">
                     <div className="flex items-center gap-3">
-                      <PhoneIcon className="h-5 w-5 text-gray-500 flex-shrink-0" />
+                      <PhoneIcon className="h-5 w-5 text-gray-500 shrink-0" />
                       <span className="text-gray-800">
                         {appt.patientPhone || "—"}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <EnvelopeIcon className="h-5 w-5 text-gray-500 flex-shrink-0" />
+                      <EnvelopeIcon className="h-5 w-5 text-gray-500 shrink-0" />
                       <span className="text-gray-800 break-all">
                         {appt.patientEmail || "—"}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <UserIcon className="h-5 w-5 text-gray-500 flex-shrink-0" />
+                      <UserIcon className="h-5 w-5 text-gray-500 shrink-0" />
                       <span className="text-gray-800">
                         {appt.patientGender || "—"}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <ClockIcon className="h-5 w-5 text-gray-500 flex-shrink-0" />
+                      <ClockIcon className="h-5 w-5 text-gray-500 shrink-0" />
                       <span className="text-gray-600">
                         Booked: {formatBooked(appt.createdAt)}
                       </span>
