@@ -72,7 +72,7 @@ export default function ServiceDoctorsPage() {
   const Icon = service.icon;
 
   const handleBookAppointment = (doctor) => {
-    openModal(doctor); // ✅ Open modal instead of routing
+    openModal(doctor); 
   };
 
   return (
