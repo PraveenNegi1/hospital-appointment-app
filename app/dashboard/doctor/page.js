@@ -6,6 +6,7 @@ import { auth, db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import DoctorSidebar from "@/components/DoctorSidebar";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 export default function DoctorDashboard() {
   const [doctorData, setDoctorData] = useState(null);
@@ -15,6 +16,7 @@ export default function DoctorDashboard() {
   const [requestSuccess, setRequestSuccess] = useState(false);
   const [requestError, setRequestError] = useState(null);
   const router = useRouter();
+  const [newAppointmentsCount, setNewAppointmentsCount] = useState(0);
 
   const fetchDoctorData = async () => {
     const currentUser = auth.currentUser;
@@ -31,7 +33,7 @@ export default function DoctorDashboard() {
         setDoctorData(doctorSnap.data());
       } else {
         setError(
-          "Your doctor profile not found. Please complete your profile first."
+          "Your doctor profile not found. Please complete your profile first.",
         );
       }
     } catch (err) {
@@ -45,6 +47,23 @@ export default function DoctorDashboard() {
   useEffect(() => {
     fetchDoctorData();
   }, [router]);
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const q = query(
+      collection(db, "appointments"),
+      where("doctorId", "==", user.uid),
+      where("status", "==", "pending"),
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setNewAppointmentsCount(snapshot.size);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleRequestApproval = async () => {
     if (!confirm("Send approval request to admin?")) return;
@@ -130,10 +149,10 @@ export default function DoctorDashboard() {
                   requestLoading
                     ? "bg-yellow-500 cursor-not-allowed"
                     : requestSuccess
-                    ? "bg-green-600 cursor-not-allowed"
-                    : isRejected
-                    ? "bg-orange-600 hover:bg-orange-700"
-                    : "bg-yellow-600 hover:bg-yellow-700 active:bg-yellow-800"
+                      ? "bg-green-600 cursor-not-allowed"
+                      : isRejected
+                        ? "bg-orange-600 hover:bg-orange-700"
+                        : "bg-yellow-600 hover:bg-yellow-700 active:bg-yellow-800"
                 }`}
               >
                 {requestLoading ? (
@@ -173,16 +192,16 @@ export default function DoctorDashboard() {
               isApproved
                 ? "bg-green-50 border-green-200 text-green-800"
                 : isRejected
-                ? "bg-red-50 border-red-200 text-red-800"
-                : "bg-yellow-50 border-yellow-200 text-yellow-800"
+                  ? "bg-red-50 border-red-200 text-red-800"
+                  : "bg-yellow-50 border-yellow-200 text-yellow-800"
             }`}
           >
             <p className="font-medium text-lg">
               {isApproved
                 ? "Your profile is approved and visible to patients."
                 : isRejected
-                ? "Your profile was rejected by admin. You can request approval again."
-                : "Your profile is pending approval. Once approved, patients can find and book you."}
+                  ? "Your profile was rejected by admin. You can request approval again."
+                  : "Your profile is pending approval. Once approved, patients can find and book you."}
             </p>
 
             {isRejected && doctorData?.rejectionReason && (
@@ -302,9 +321,14 @@ export default function DoctorDashboard() {
 
                 <Link
                   href="/dashboard/doctor/appointments"
-                  className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition font-medium"
+                  className="relative bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition font-medium inline-flex items-center"
                 >
                   View Appointments
+                  {newAppointmentsCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+                      {newAppointmentsCount}
+                    </span>
+                  )}
                 </Link>
               </div>
             </div>

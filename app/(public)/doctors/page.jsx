@@ -17,7 +17,10 @@ export default function DoctorsPage() {
   useEffect(() => {
     const fetchApprovedDoctors = async () => {
       try {
-        const q = query(collection(db, "doctors"), where("status", "==", "approved"));
+        const q = query(
+          collection(db, "doctors"),
+          where("status", "==", "approved"),
+        );
         const querySnapshot = await getDocs(q);
 
         const doctorsList = querySnapshot.docs.map((doc) => ({
@@ -107,7 +110,10 @@ export default function DoctorsPage() {
                 {/* Doctor Header */}
                 <div className="bg-linear-to-r from-indigo-500 to-indigo-700 p-6 text-white">
                   <h3 className="text-2xl font-bold">
-                    Dr. {doctor.fullName?.split(" ").pop() || doctor.name || "Doctor"}
+                    Dr.{" "}
+                    {doctor.fullName?.split(" ").pop() ||
+                      doctor.name ||
+                      "Doctor"}
                   </h3>
                   <p className="mt-2 text-indigo-100 text-lg">
                     {doctor.specialty || "Specialist"}
@@ -122,7 +128,9 @@ export default function DoctorsPage() {
                   </p>
                   <p>
                     <span className="font-semibold">Experience:</span>{" "}
-                    {doctor.experienceYears ? `${doctor.experienceYears} years` : "—"}
+                    {doctor.experienceYears
+                      ? `${doctor.experienceYears} years`
+                      : "—"}
                   </p>
                   <p>
                     <span className="font-semibold">Clinic/Hospital:</span>{" "}
@@ -151,7 +159,8 @@ export default function DoctorsPage() {
                   )}
                   {doctor.timings && (
                     <p>
-                      <span className="font-semibold">Timings:</span> {doctor.timings}
+                      <span className="font-semibold">Timings:</span>{" "}
+                      {doctor.timings}
                     </p>
                   )}
                   {doctor.hospitalAddress && (
@@ -185,14 +194,14 @@ export default function DoctorsPage() {
 
       {/* Booking Modal */}
       {isModalOpen && selectedDoctor && (
-<BookingModal
-        doctor={{
-          ...selectedDoctor,          
-          uid: selectedDoctor.id,      
-          // id: selectedDoctor.id,   
-        }}
-        onClose={closeModal}
-      />     )}
+        <BookingModal
+          doctor={{
+            ...selectedDoctor,
+            uid: selectedDoctor.id,
+          }}
+          onClose={closeModal}
+        />
+      )}
     </div>
   );
 }

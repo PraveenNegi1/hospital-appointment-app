@@ -6,14 +6,18 @@ import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useParams, useRouter } from "next/navigation";
 import { servicesData } from "@/app/(public)/services/data";
+import BookingModal from "@/components/BookingModal"; // ✅ Added
+
 import {
-  Stethoscope,
   ArrowLeft,
   User,
   Briefcase,
   IndianRupee,
-  Eye,
-  CheckCircle,
+  MapPin,
+  Phone,
+  Mail,
+  GraduationCap,
+  CalendarDays,
 } from "lucide-react";
 
 export default function ServiceDoctorsPage() {
@@ -21,250 +25,248 @@ export default function ServiceDoctorsPage() {
   const router = useRouter();
   const service = servicesData.find((s) => s.slug === slug);
 
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+
+  const openModal = (doctor) => {
+    setSelectedDoctor(doctor);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedDoctor(null);
+  };
+
+  useEffect(() => {
+    if (!slug) return;
+
+    const q = query(
+      collection(db, "doctors"),
+      where("status", "==", "approved"),
+      where("specialty", "==", slug.toLowerCase()),
+    );
+
+    const unsub = onSnapshot(q, (snapshot) => {
+      const docs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setDoctors(docs);
+      setLoading(false);
+    });
+
+    return () => unsub();
+  }, [slug]);
+
   if (!service) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-gray-100 via-white to-gray-50">
-        <div className="text-center p-8 rounded-xl shadow-lg bg-white/90 backdrop-blur-md">
-          <h1 className="text-5xl font-extrabold text-gray-800 mb-4">
-            Service Not Found
-          </h1>
-          <button
-            onClick={() => router.push("/services")}
-            className="mt-4 inline-flex items-center gap-2 text-indigo-600 font-semibold hover:underline"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Back to Services
-          </button>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        Service Not Found
       </div>
     );
   }
 
-  const specialtyTitle = service.title;
-  const [doctors, setDoctors] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const q = query(
-      collection(db, "doctors"),
-      where("approved", "==", true),
-      where("specialty", "==", specialtyTitle)
-    );
-
-    const unsub = onSnapshot(
-      q,
-      (snapshot) => {
-        const docs = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setDoctors(docs);
-        setLoading(false);
-      },
-      (error) => {
-        console.error("Error fetching doctors:", error);
-        setLoading(false);
-      }
-    );
-
-    return () => unsub();
-  }, [specialtyTitle]);
-
-  const handleViewDoctor = (doctor) => {
-    const doctorSlug = doctor.name
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, "-")
-      .replace(/[^\w\-]+/g, "")
-      .replace(/\-\-+/g, "-")
-      .replace(/^-+|-+$/g, "");
-    router.push(`/doctors/${doctorSlug}?from=${slug}`);
-  };
-
   const Icon = service.icon;
+
+  const handleBookAppointment = (doctor) => {
+    openModal(doctor); // ✅ Open modal instead of routing
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 font-serif">
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-28 px-4 overflow-hidden">
-        <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-indigo-200/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -right-32 w-[500px] h-[500px] bg-pink-200/30 rounded-full blur-3xl animate-pulse"></div>
-
-        <div className="relative max-w-7xl mx-auto text-center">
-          <div className="inline-flex items-center justify-center w-28 h-28 bg-gradient-to-br from-indigo-300 via-purple-400 to-pink-300 rounded-full mb-8 shadow-xl transform hover:scale-105 transition-all duration-500">
-            <Icon className="w-14 h-14 text-white" />
-          </div>
-          <h1 className="text-4xl  font-extrabold text-gray-900 mb-6 animate-fadeIn">
-            {service.title}
-          </h1>
-          <p className="text-lg  text-gray-700 max-w-3xl mx-auto animate-fadeIn delay-200">
-            {service.shortDesc}
-          </p>
-
-          <div className="mt-12 flex justify-center gap-6 flex-wrap">
-            <button
-              onClick={() => router.push("/services")}
-              className="inline-flex items-center gap-3 px-6 py-3 bg-white/90 backdrop-blur-md rounded-full shadow-lg hover:shadow-2xl transition text-indigo-600 font-medium"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              All Services
-            </button>
-            <button
-              onClick={() => router.push("/doctors")}
-              className="inline-flex items-center gap-3 px-6 py-3 bg-white/90 backdrop-blur-md rounded-full shadow-lg hover:shadow-2xl transition text-indigo-600 font-medium"
-            >
-              <Stethoscope className="w-5 h-5" />
-              All Doctors
-            </button>
-          </div>
-        </div>
+      {/* HERO */}
+      <section className="py-20 text-center">
+        <Icon className="w-16 h-16 mx-auto text-indigo-600 mb-4" />
+        <h1 className="text-4xl font-bold mb-4">{service.title}</h1>
+        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          {service.shortDesc}
+        </p>
       </section>
 
-      {/* Overview Section */}
-      <section className="max-w-7xl mx-auto px-4 mb-20">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 hover:scale-[1.01] transition-transform duration-500">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            Overview
-          </h2>
-          <p className="text-lg text-gray-700 leading-relaxed">
-            {service.content.overview}
+      {/* SERVICE FULL CONTENT */}
+      <section className="max-w-6xl mx-auto px-4 pb-20 space-y-16">
+        <div className="bg-white p-8 rounded-3xl shadow-xl">
+          <h2 className="text-2xl font-bold mb-4">Overview</h2>
+          <p className="text-gray-700 leading-relaxed">
+            {service.content?.overview}
           </p>
         </div>
+
+        {service.content?.treatments && (
+          <div className="bg-white p-8 rounded-3xl shadow-xl">
+            <h2 className="text-2xl font-bold mb-6">Treatments & Services</h2>
+            <ul className="grid md:grid-cols-2 gap-4">
+              {service.content.treatments.map((item, index) => (
+                <li key={index} className="bg-indigo-50 p-4 rounded-xl">
+                  ✔ {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {service.content?.facilities && (
+          <div className="bg-white p-8 rounded-3xl shadow-xl">
+            <h2 className="text-2xl font-bold mb-6">Facilities</h2>
+            <ul className="grid md:grid-cols-2 gap-4">
+              {service.content.facilities.map((item, index) => (
+                <li key={index} className="bg-purple-50 p-4 rounded-xl">
+                  ✔ {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {service.content?.doctors && (
+          <div className="bg-white p-8 rounded-3xl shadow-xl">
+            <h2 className="text-2xl font-bold mb-6">
+              Our {service.title} Specialists
+            </h2>
+            <ul className="grid md:grid-cols-2 gap-4">
+              {service.content.doctors.map((doc, index) => (
+                <li key={index} className="bg-pink-50 p-4 rounded-xl">
+                  👨‍⚕️ {doc}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {service.content?.faqs && (
+          <div className="bg-white p-8 rounded-3xl shadow-xl">
+            <h2 className="text-2xl font-bold mb-6">
+              Frequently Asked Questions
+            </h2>
+            <div className="space-y-6">
+              {service.content.faqs.map((faq, index) => (
+                <div key={index}>
+                  <h3 className="font-semibold text-lg">{faq.q}</h3>
+                  <p className="text-gray-600 mt-2">{faq.a}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
 
-      {/* Treatments & Facilities */}
-      <section className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-10 mb-20">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10 hover:scale-[1.02] transition-transform duration-500">
-          <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">
-            Treatments Offered
-          </h3>
-          <ul className="space-y-4">
-            {service.content.treatments.map((t, i) => (
-              <li key={i} className="flex items-start gap-4">
-                <CheckCircle className="w-6 h-6 text-emerald-500 mt-0.5" />
-                <span className="text-lg text-gray-700">{t}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10 hover:scale-[1.02] transition-transform duration-500">
-          <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">
-            Facilities Available
-          </h3>
-          <ul className="space-y-4">
-            {service.content.facilities.map((f, i) => (
-              <li key={i} className="flex items-start gap-4">
-                <CheckCircle className="w-6 h-6 text-indigo-600 mt-0.5" />
-                <span className="text-lg text-gray-700">{f}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* Doctors Section */}
+      {/* FIRESTORE DOCTORS */}
       <section className="max-w-7xl mx-auto px-4 pb-20">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
-            Meet Our {service.title} Specialists
-          </h2>
-          <p className="text-xl text-gray-600 mt-4">
-            {doctors.length > 0
-              ? `We have ${doctors.length} verified specialist${
-                  doctors.length > 1 ? "s" : ""
-                } ready to help you`
-              : "We're continuously adding trusted specialists"}
-          </p>
-        </div>
+        <h2 className="text-3xl font-bold text-center mb-12">
+          Available Doctors
+        </h2>
 
         {loading ? (
-          <div className="text-center py-20">
-            <div className="inline-block animate-spin rounded-full h-14 w-14 border-t-4 border-indigo-600"></div>
-            <p className="mt-6 text-lg text-gray-600">Loading specialists...</p>
-          </div>
+          <div className="text-center">Loading doctors...</div>
         ) : doctors.length === 0 ? (
-          <div className="text-center py-32 bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl border border-gray-200">
-            <User className="w-32 h-32 text-gray-300 mx-auto mb-8" />
-            <p className="text-3xl font-semibold text-gray-600">
-              No {service.title} specialists available
-            </p>
-            <p className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-              We are actively onboarding verified doctors in this specialty.
-              Please check back soon.
-            </p>
+          <div className="text-center text-gray-500">
+            No doctors available for this service.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-10">
             {doctors.map((doctor) => (
               <div
                 key={doctor.id}
-                onClick={() => handleViewDoctor(doctor)}
-                className="group bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 overflow-hidden border border-gray-200 cursor-pointer hover:scale-[1.03]"
+                className="bg-white rounded-3xl shadow-xl p-8 border hover:shadow-2xl transition"
               >
-                <div className="h-56 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 relative flex items-center justify-center overflow-hidden">
-                  <div className="absolute inset-0 bg-black/20" />
-                  <User className="w-28 h-28 text-white/90 z-10" />
-                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-20 bg-gradient-to-t from-black/70 to-transparent">
-                    <h3 className="text-2xl font-bold">Dr. {doctor.name}</h3>
-                    <p className="text-lg opacity-95">{doctor.specialty}</p>
-                  </div>
+                <div className="text-center mb-6">
+                  <User className="w-16 h-16 mx-auto text-indigo-600 mb-3" />
+                  <h3 className="text-xl font-bold">Dr. {doctor.fullName}</h3>
+                  <p className="text-indigo-600 capitalize">
+                    {doctor.specialty}
+                  </p>
                 </div>
 
-                <div className="p-6 text-center">
-                  <div className="space-y-3 mb-6">
-                    {doctor.experience > 0 && (
-                      <div className="flex items-center justify-center gap-2 text-gray-700">
-                        <Briefcase className="w-5 h-5 text-emerald-600" />
-                        <span className="font-medium">
-                          {doctor.experience} years experience
-                        </span>
-                      </div>
-                    )}
-                    {doctor.fee > 0 && (
-                      <div className="text-2xl font-bold text-emerald-700 flex items-center justify-center gap-2">
-                        <IndianRupee className="w-6 h-6" />₹{doctor.fee}
-                      </div>
-                    )}
-                  </div>
+                <div className="space-y-3 text-gray-700 text-sm">
+                  {doctor.bio && (
+                    <div className="bg-indigo-50 p-3 rounded-xl text-gray-600">
+                      {doctor.bio}
+                    </div>
+                  )}
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleViewDoctor(doctor);
-                    }}
-                    className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-2xl shadow-lg transition flex items-center justify-center gap-3"
-                  >
-                    <Eye className="w-6 h-6" />
-                    View Full Profile
-                  </button>
+                  {doctor.qualification && (
+                    <div className="flex items-center gap-2">
+                      <GraduationCap className="w-4 h-4" />
+                      {doctor.qualification}
+                    </div>
+                  )}
+
+                  {doctor.experienceYears && (
+                    <div className="flex items-center gap-2">
+                      <Briefcase className="w-4 h-4" />
+                      {doctor.experienceYears} Years Experience
+                    </div>
+                  )}
+
+                  {doctor.consultationFee && (
+                    <div className="flex items-center gap-2 font-semibold text-emerald-700">
+                      <IndianRupee className="w-4 h-4" />₹
+                      {doctor.consultationFee}
+                    </div>
+                  )}
+
+                  {doctor.clinicName && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      {doctor.clinicName}
+                    </div>
+                  )}
+
+                  {doctor.clinicAddress && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      {doctor.clinicAddress}
+                    </div>
+                  )}
+
+                  {doctor.availability && (
+                    <div className="flex items-center gap-2">
+                      <CalendarDays className="w-4 h-4" />
+                      {doctor.availability}
+                    </div>
+                  )}
+
+                  {doctor.phoneNumber && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      {doctor.phoneNumber}
+                    </div>
+                  )}
+
+                  {doctor.email && (
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      {doctor.email}
+                    </div>
+                  )}
                 </div>
+
+                <button
+                  onClick={() => handleBookAppointment(doctor)}
+                  className="mt-6 w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold"
+                >
+                  📅 Book Appointment
+                </button>
               </div>
             ))}
           </div>
         )}
       </section>
 
-      {/* FAQs */}
-      {service.content.faqs?.length > 0 && (
-        <section className="max-w-4xl mx-auto px-4 pb-24">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-6">
-            {service.content.faqs.map((faq, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-2xl shadow-lg p-6 md:p-8 hover:scale-[1.02] transition-transform duration-500"
-              >
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  {faq.q}
-                </h3>
-                <p className="text-gray-600 text-lg">{faq.a}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      {/* ✅ BOOKING MODAL */}
+      {isModalOpen && selectedDoctor && (
+        <BookingModal
+          doctor={{
+            ...selectedDoctor,
+            uid: selectedDoctor.id,
+          }}
+          onClose={closeModal}
+        />
       )}
     </div>
   );
