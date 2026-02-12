@@ -76,8 +76,8 @@ export default function DoctorsPage() {
   }
 
   return (
-    <div className="min-h-screen font-serif bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen font-serif bg-linear-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full  ">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-3xl  font-bold text-gray-900 mb-4">
@@ -98,14 +98,14 @@ export default function DoctorsPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-3  gap-8">
             {doctors.map((doctor) => (
               <div
                 key={doctor.id}
                 className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300 flex flex-col h-full"
               >
                 {/* Doctor Header */}
-                <div className="bg-gradient-to-r from-indigo-500 to-indigo-700 p-6 text-white">
+                <div className="bg-linear-to-r from-indigo-500 to-indigo-700 p-6 text-white">
                   <h3 className="text-2xl font-bold">
                     Dr. {doctor.fullName?.split(" ").pop() || doctor.name || "Doctor"}
                   </h3>
@@ -115,7 +115,7 @@ export default function DoctorsPage() {
                 </div>
 
                 {/* All Details */}
-                <div className="p-6 flex-grow space-y-4 text-gray-700">
+                <div className="p-6 grow space-y-4 text-gray-700">
                   <p>
                     <span className="font-semibold">Qualification:</span>{" "}
                     {doctor.qualification || "—"}
