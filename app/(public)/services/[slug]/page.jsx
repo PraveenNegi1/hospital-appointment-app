@@ -1,4 +1,3 @@
-// app/services/[slug]/page.jsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -6,7 +5,7 @@ import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useParams, useRouter } from "next/navigation";
 import { servicesData } from "@/app/(public)/services/data";
-import BookingModal from "@/components/BookingModal"; // ✅ Added
+import BookingModal from "@/components/BookingModal"; 
 
 import {
   ArrowLeft,
