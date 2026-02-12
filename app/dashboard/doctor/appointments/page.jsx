@@ -203,7 +203,7 @@ export default function DoctorAppointmentsDashboard() {
   }
 
   return (
-    <div className="min-h-screen font-serif bg-gradient-to-br from-gray-50 via-white to-indigo-50/30">
+    <div className="min-h-screen font-serif bg-linear-to-br from-gray-50 via-white to-indigo-50/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
           <div>
@@ -251,7 +251,7 @@ export default function DoctorAppointmentsDashboard() {
                 key={appt.id}
                 className="bg-white rounded-2xl border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group"
               >
-                <div className="px-6 py-5 bg-gradient-to-r from-indigo-600/95 to-indigo-700/95 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="px-6 py-5 bg-linear-to-r from-indigo-600/95 to-indigo-700/95 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="space-y-1.5">
                     <h3 className="text-xl sm:text-2xl font-semibold">
                       {appt.patientName || "Patient"}{" "}
