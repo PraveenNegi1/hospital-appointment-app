@@ -26,6 +26,7 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   ArrowPathIcon,
+  CheckBadgeIcon, // ← new for completed
 } from "@heroicons/react/24/outline";
 
 export default function DoctorAppointmentsDashboard() {
@@ -55,7 +56,7 @@ export default function DoctorAppointmentsDashboard() {
     const q = query(
       collection(db, "appointments"),
       where("doctorId", "==", doctorUid),
-      orderBy("createdAt", "desc")
+      orderBy("createdAt", "desc"),
     );
 
     return onSnapshot(
@@ -73,12 +74,16 @@ export default function DoctorAppointmentsDashboard() {
         console.error("Firestore error:", err);
         setError("Failed to load appointments. Please try again.");
         setLoading(false);
-      }
+      },
     );
   };
 
-  const updateStatus = async (id, newStatus) => {
-    if (!confirm(`Are you sure you want to ${newStatus} this appointment?`)) {
+  const updateStatus = async (id, newStatus, sendNotification = false) => {
+    if (
+      !confirm(
+        `Are you sure you want to mark this appointment as ${newStatus}?`,
+      )
+    ) {
       return;
     }
 
@@ -93,31 +98,43 @@ export default function DoctorAppointmentsDashboard() {
 
       const apptData = apptSnap.data();
 
-      // Update status
+      // Update status in Firestore
       await updateDoc(appointmentRef, {
         status: newStatus,
         updatedAt: Timestamp.now(),
         updatedBy: auth.currentUser?.uid || "system",
       });
 
-      // Send notification to patient when confirmed
-      if (newStatus.toLowerCase() === "confirmed") {
-        if (!apptData.patientId) {
-          console.warn("No patientId found → notification not sent");
-        } else {
+      // Optional: Send notification to patient
+      if (sendNotification && apptData.patientId) {
+        let message = "";
+        let type = "";
+
+        if (newStatus.toLowerCase() === "confirmed") {
+          type = "appointment_confirmed";
+          message = `Your appointment has been CONFIRMED!\n\nDoctor: ${apptData.doctorName || "Your Doctor"}\nDate: ${formatDate(apptData.date)}\nTime: ${formatTime(apptData.time)}`;
+        } else if (newStatus.toLowerCase() === "completed") {
+          type = "appointment_completed";
+          message = `Your check-up with ${apptData.doctorName || "Doctor"} is COMPLETED.\nThank you for visiting!\n\nDate: ${formatDate(apptData.date)}\nTime: ${formatTime(apptData.time)}\n\nTake care of your health.`;
+        }
+
+        if (message) {
           await addDoc(collection(db, "notifications"), {
             userId: apptData.patientId,
-            type: "appointment_confirmed",
+            type,
             appointmentId: id,
             doctorName: apptData.doctorName || "Doctor",
             patientName: apptData.patientName || "Patient",
             date: formatDate(apptData.date),
             time: formatTime(apptData.time),
-            message: `Your appointment has been CONFIRMED!\n\nDoctor: ${apptData.doctorName || "Your Doctor"}\nDate: ${formatDate(apptData.date)}\nTime: ${formatTime(apptData.time)}`,
+            message,
             createdAt: Timestamp.now(),
             isRead: false,
           });
-          console.log("Notification created for patient:", apptData.patientId);
+          console.log(
+            `Notification sent for ${newStatus}:`,
+            apptData.patientId,
+          );
         }
       }
 
@@ -157,13 +174,16 @@ export default function DoctorAppointmentsDashboard() {
   };
 
   const getStatusStyle = (status) => {
-    switch (status?.toLowerCase()) {
+    const lower = status?.toLowerCase() || "pending";
+    switch (lower) {
       case "confirmed":
         return "bg-emerald-100 text-emerald-800 border-emerald-200";
       case "rejected":
         return "bg-rose-100 text-rose-800 border-rose-200";
       case "cancelled":
         return "bg-gray-100 text-gray-700 border-gray-200 line-through";
+      case "completed":
+        return "bg-blue-100 text-blue-800 border-blue-200"; // new style for completed
       case "pending":
       default:
         return "bg-amber-100 text-amber-800 border-amber-200 animate-pulse-slow";
@@ -203,7 +223,7 @@ export default function DoctorAppointmentsDashboard() {
   }
 
   return (
-    <div className="min-h-screen font-serif bg-linear-to-br from-gray-50 via-white to-indigo-50/30">
+    <div className="min-h-screen font-serif bg-gradient-to-br from-gray-50 via-white to-indigo-50/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
           <div>
@@ -251,7 +271,7 @@ export default function DoctorAppointmentsDashboard() {
                 key={appt.id}
                 className="bg-white rounded-2xl border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group"
               >
-                <div className="px-6 py-5 bg-linear-to-r from-indigo-600/95 to-indigo-700/95 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="px-6 py-5 bg-gradient-to-r from-indigo-600/95 to-indigo-700/95 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="space-y-1.5">
                     <h3 className="text-xl sm:text-2xl font-semibold">
                       {appt.patientName || "Patient"}{" "}
@@ -283,7 +303,7 @@ export default function DoctorAppointmentsDashboard() {
 
                   <div
                     className={`px-5 py-1.5 rounded-full text-sm font-medium border ${getStatusStyle(
-                      appt.status
+                      appt.status,
                     )}`}
                   >
                     {appt.status
@@ -331,24 +351,45 @@ export default function DoctorAppointmentsDashboard() {
                   </div>
                 </div>
 
-                {appt.status?.toLowerCase() === "pending" && (
-                  <div className="border-t bg-gray-50/70 px-6 py-5 flex gap-4">
+                {/* Action Buttons */}
+                <div className="border-t bg-gray-50/70 px-6 py-5 flex flex-wrap gap-4">
+                  {appt.status?.toLowerCase() === "pending" && (
+                    <>
+                      <button
+                        onClick={() => updateStatus(appt.id, "confirmed", true)}
+                        className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98] min-w-[140px]"
+                      >
+                        <CheckCircleIcon className="h-5 w-5" />
+                        Confirm
+                      </button>
+                      <button
+                        onClick={() => updateStatus(appt.id, "rejected")}
+                        className="flex-1 flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98] min-w-[140px]"
+                      >
+                        <XCircleIcon className="h-5 w-5" />
+                        Reject
+                      </button>
+                    </>
+                  )}
+
+                  {appt.status?.toLowerCase() === "confirmed" && (
                     <button
-                      onClick={() => updateStatus(appt.id, "confirmed")}
-                      className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98]"
+                      onClick={() => updateStatus(appt.id, "completed", true)}
+                      className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98] min-w-[180px]"
                     >
-                      <CheckCircleIcon className="h-5 w-5" />
-                      Confirm
+                      <CheckBadgeIcon className="h-5 w-5" />
+                      Mark as Completed
                     </button>
-                    <button
-                      onClick={() => updateStatus(appt.id, "rejected")}
-                      className="flex-1 flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98]"
-                    >
-                      <XCircleIcon className="h-5 w-5" />
-                      Reject
-                    </button>
-                  </div>
-                )}
+                  )}
+
+                  {/* Optional: disabled look for already completed */}
+                  {appt.status?.toLowerCase() === "completed" && (
+                    <div className="flex-1 flex items-center justify-center gap-2 bg-gray-300 text-gray-700 py-3.5 rounded-xl font-medium cursor-not-allowed min-w-[180px]">
+                      <CheckBadgeIcon className="h-5 w-5" />
+                      Completed
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
