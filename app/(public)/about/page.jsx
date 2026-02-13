@@ -80,7 +80,7 @@ export default function AboutPage() {
       <section className="bg-gradient-to-r from-indigo-50 to-purple-50 py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+            <h2 className="text-3xl  font-bold text-gray-900">
               Our Mission
             </h2>
             <p className="mt-4 text-xl text-gray-700 max-w-4xl mx-auto">
@@ -125,7 +125,7 @@ export default function AboutPage() {
 
       {/* How It Works */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
-        <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
+        <h2 className="text-3xl  font-bold text-center text-gray-900 mb-12">
           How It Works
         </h2>
 
@@ -195,7 +195,7 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           {/* Heading & Description */}
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            <h2 className="text-3xl  font-bold text-gray-900 mb-6">
               Trusted by Patients & Doctors Nationwide
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -261,7 +261,7 @@ export default function AboutPage() {
       {/* Vision & Closing */}
       <section className="bg-gradient-to-b from-gray-50 to-white py-10">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+          <h2 className="text-3xl  font-bold text-gray-900 mb-6">
             Our Vision
           </h2>
           <p className="text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto">
