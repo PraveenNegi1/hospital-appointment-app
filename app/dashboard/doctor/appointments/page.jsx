@@ -26,7 +26,8 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   ArrowPathIcon,
-  CheckBadgeIcon, // ← new for completed
+  CheckBadgeIcon,
+  InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 
 export default function DoctorAppointmentsDashboard() {
@@ -56,7 +57,7 @@ export default function DoctorAppointmentsDashboard() {
     const q = query(
       collection(db, "appointments"),
       where("doctorId", "==", doctorUid),
-      orderBy("createdAt", "desc"),
+      orderBy("createdAt", "desc")
     );
 
     return onSnapshot(
@@ -74,16 +75,12 @@ export default function DoctorAppointmentsDashboard() {
         console.error("Firestore error:", err);
         setError("Failed to load appointments. Please try again.");
         setLoading(false);
-      },
+      }
     );
   };
 
   const updateStatus = async (id, newStatus, sendNotification = false) => {
-    if (
-      !confirm(
-        `Are you sure you want to mark this appointment as ${newStatus}?`,
-      )
-    ) {
+    if (!confirm(`Are you sure you want to mark this appointment as ${newStatus}?`)) {
       return;
     }
 
@@ -98,14 +95,12 @@ export default function DoctorAppointmentsDashboard() {
 
       const apptData = apptSnap.data();
 
-      // Update status in Firestore
       await updateDoc(appointmentRef, {
         status: newStatus,
         updatedAt: Timestamp.now(),
         updatedBy: auth.currentUser?.uid || "system",
       });
 
-      // Optional: Send notification to patient
       if (sendNotification && apptData.patientId) {
         let message = "";
         let type = "";
@@ -131,10 +126,7 @@ export default function DoctorAppointmentsDashboard() {
             createdAt: Timestamp.now(),
             isRead: false,
           });
-          console.log(
-            `Notification sent for ${newStatus}:`,
-            apptData.patientId,
-          );
+          console.log(`Notification sent for ${newStatus}:`, apptData.patientId);
         }
       }
 
@@ -174,7 +166,7 @@ export default function DoctorAppointmentsDashboard() {
   };
 
   const getStatusStyle = (status) => {
-    const lower = status?.toLowerCase() || "pending";
+    const lower = (status || "pending").toLowerCase();
     switch (lower) {
       case "confirmed":
         return "bg-emerald-100 text-emerald-800 border-emerald-200";
@@ -183,10 +175,28 @@ export default function DoctorAppointmentsDashboard() {
       case "cancelled":
         return "bg-gray-100 text-gray-700 border-gray-200 line-through";
       case "completed":
-        return "bg-blue-100 text-blue-800 border-blue-200"; // new style for completed
+        return "bg-blue-100 text-blue-800 border-blue-200 font-medium";
       case "pending":
       default:
         return "bg-amber-100 text-amber-800 border-amber-200 animate-pulse-slow";
+    }
+  };
+
+  const getStatusAction = (status) => {
+    const lower = (status || "pending").toLowerCase();
+    switch (lower) {
+      case "pending":
+        return "pending";
+      case "confirmed":
+        return "confirmed";
+      case "completed":
+        return "completed";
+      case "rejected":
+        return "rejected";
+      case "cancelled":
+        return "cancelled";
+      default:
+        return "unknown";
     }
   };
 
@@ -231,8 +241,7 @@ export default function DoctorAppointmentsDashboard() {
               Appointments
             </h1>
             <p className="mt-2 text-gray-600">
-              Manage your patient schedule • {appointments.length} booking
-              {appointments.length !== 1 ? "s" : ""}
+              All your appointments • {appointments.length} total
             </p>
           </div>
 
@@ -260,138 +269,136 @@ export default function DoctorAppointmentsDashboard() {
               No appointments yet
             </h3>
             <p className="text-gray-600 max-w-md mx-auto">
-              When patients book with you, their appointments will appear here
-              in real time.
+              When patients book with you, their appointments will appear here in real time.
             </p>
           </div>
         ) : (
           <div className="grid gap-6 md:gap-8">
-            {appointments.map((appt) => (
-              <div
-                key={appt.id}
-                className="bg-white rounded-2xl border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group"
-              >
-                <div className="px-6 py-5 bg-gradient-to-r from-indigo-600/95 to-indigo-700/95 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="space-y-1.5">
-                    <h3 className="text-xl sm:text-2xl font-semibold">
-                      {appt.patientName || "Patient"}{" "}
-                      <span className="text-indigo-200 font-normal">
-                        • {appt.patientAge || "?"} yrs
-                      </span>
-                    </h3>
+            {appointments.map((appt) => {
+              const statusAction = getStatusAction(appt.status);
 
-                    <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-indigo-100/90 text-sm">
-                      <div className="flex items-center gap-1.5">
-                        <CalendarDaysIcon className="h-4.5 w-4.5" />
-                        {formatDate(appt.date)}
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <ClockIcon className="h-4.5 w-4.5" />
-                        {formatTime(appt.time)}
-                      </div>
-                      <p className="text-[14px] font-medium font-serif text-green-700 bg-green-100 px-3 py-1 rounded-full inline-block">
-                        Booked Slot
-                      </p>
-                      {appt.patientLocation && (
+              return (
+                <div
+                  key={appt.id}
+                  className="bg-white rounded-2xl border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group"
+                >
+                  <div className="px-6 py-5 bg-gradient-to-r from-indigo-600/95 to-indigo-700/95 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-1.5">
+                      <h3 className="text-xl sm:text-2xl font-semibold">
+                        {appt.patientName || "Patient"}{" "}
+                        <span className="text-indigo-200 font-normal">
+                          • {appt.patientAge || "?"} yrs
+                        </span>
+                      </h3>
+
+                      <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-indigo-100/90 text-sm">
                         <div className="flex items-center gap-1.5">
-                          <MapPinIcon className="h-4.5 w-4.5" />
-                          {appt.patientLocation}
+                          <CalendarDaysIcon className="h-4.5 w-4.5" />
+                          {formatDate(appt.date)}
                         </div>
-                      )}
+                        <div className="flex items-center gap-1.5">
+                          <ClockIcon className="h-4.5 w-4.5" />
+                          {formatTime(appt.time)}
+                        </div>
+                        {appt.patientLocation && (
+                          <div className="flex items-center gap-1.5">
+                            <MapPinIcon className="h-4.5 w-4.5" />
+                            {appt.patientLocation}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  <div
-                    className={`px-5 py-1.5 rounded-full text-sm font-medium border ${getStatusStyle(
-                      appt.status,
-                    )}`}
-                  >
-                    {appt.status
-                      ? appt.status.charAt(0).toUpperCase() +
-                        appt.status.slice(1)
-                      : "Pending"}
-                  </div>
-                </div>
-
-                <div className="p-6 lg:p-7 grid md:grid-cols-2 gap-6">
-                  <div>
-                    <div className="text-sm font-semibold text-gray-700 mb-1.5">
-                      Reason for visit
-                    </div>
-                    <p className="text-gray-800 leading-relaxed">
-                      {appt.reason || "General check-up / consultation"}
-                    </p>
-                  </div>
-
-                  <div className="space-y-3 text-sm">
-                    <div className="flex items-center gap-3">
-                      <PhoneIcon className="h-5 w-5 text-gray-500 shrink-0" />
-                      <span className="text-gray-800">
-                        {appt.patientPhone || "—"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <EnvelopeIcon className="h-5 w-5 text-gray-500 shrink-0" />
-                      <span className="text-gray-800 break-all">
-                        {appt.patientEmail || "—"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <UserIcon className="h-5 w-5 text-gray-500 shrink-0" />
-                      <span className="text-gray-800">
-                        {appt.patientGender || "—"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <ClockIcon className="h-5 w-5 text-gray-500 shrink-0" />
-                      <span className="text-gray-600">
-                        Booked: {formatBooked(appt.createdAt)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="border-t bg-gray-50/70 px-6 py-5 flex flex-wrap gap-4">
-                  {appt.status?.toLowerCase() === "pending" && (
-                    <>
-                      <button
-                        onClick={() => updateStatus(appt.id, "confirmed", true)}
-                        className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98] min-w-[140px]"
-                      >
-                        <CheckCircleIcon className="h-5 w-5" />
-                        Confirm
-                      </button>
-                      <button
-                        onClick={() => updateStatus(appt.id, "rejected")}
-                        className="flex-1 flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98] min-w-[140px]"
-                      >
-                        <XCircleIcon className="h-5 w-5" />
-                        Reject
-                      </button>
-                    </>
-                  )}
-
-                  {appt.status?.toLowerCase() === "confirmed" && (
-                    <button
-                      onClick={() => updateStatus(appt.id, "completed", true)}
-                      className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98] min-w-[180px]"
+                    <div
+                      className={`px-5 py-1.5 rounded-full text-sm font-medium border ${getStatusStyle(
+                        appt.status
+                      )}`}
                     >
-                      <CheckBadgeIcon className="h-5 w-5" />
-                      Mark as Completed
-                    </button>
-                  )}
-
-                  {/* Optional: disabled look for already completed */}
-                  {appt.status?.toLowerCase() === "completed" && (
-                    <div className="flex-1 flex items-center justify-center gap-2 bg-gray-300 text-gray-700 py-3.5 rounded-xl font-medium cursor-not-allowed min-w-[180px]">
-                      <CheckBadgeIcon className="h-5 w-5" />
-                      Completed
+                      {appt.status
+                        ? appt.status.charAt(0).toUpperCase() + appt.status.slice(1)
+                        : "Pending"}
                     </div>
-                  )}
+                  </div>
+
+                  <div className="p-6 lg:p-7 grid md:grid-cols-2 gap-6">
+                    <div>
+                      <div className="text-sm font-semibold text-gray-700 mb-1.5">
+                        Reason for visit
+                      </div>
+                      <p className="text-gray-800 leading-relaxed">
+                        {appt.reason || "General check-up / consultation"}
+                      </p>
+                    </div>
+
+                    <div className="space-y-3 text-sm">
+                      <div className="flex items-center gap-3">
+                        <PhoneIcon className="h-5 w-5 text-gray-500 shrink-0" />
+                        <span className="text-gray-800">{appt.patientPhone || "—"}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <EnvelopeIcon className="h-5 w-5 text-gray-500 shrink-0" />
+                        <span className="text-gray-800 break-all">{appt.patientEmail || "—"}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <UserIcon className="h-5 w-5 text-gray-500 shrink-0" />
+                        <span className="text-gray-800">{appt.patientGender || "—"}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <ClockIcon className="h-5 w-5 text-gray-500 shrink-0" />
+                        <span className="text-gray-600">
+                          Booked: {formatBooked(appt.createdAt)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons - shown conditionally based on status */}
+                  <div className="border-t bg-gray-50/70 px-6 py-5 flex flex-wrap gap-4">
+                    {statusAction === "pending" && (
+                      <>
+                        <button
+                          onClick={() => updateStatus(appt.id, "confirmed", true)}
+                          className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98] min-w-[140px]"
+                        >
+                          <CheckCircleIcon className="h-5 w-5" />
+                          Confirm
+                        </button>
+                        <button
+                          onClick={() => updateStatus(appt.id, "rejected")}
+                          className="flex-1 flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98] min-w-[140px]"
+                        >
+                          <XCircleIcon className="h-5 w-5" />
+                          Reject
+                        </button>
+                      </>
+                    )}
+
+                    {statusAction === "confirmed" && (
+                      <button
+                        onClick={() => updateStatus(appt.id, "completed", true)}
+                        className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98] min-w-[180px]"
+                      >
+                        <CheckBadgeIcon className="h-5 w-5" />
+                        Mark as Completed
+                      </button>
+                    )}
+
+                    {(statusAction === "completed" ||
+                      statusAction === "rejected" ||
+                      statusAction === "cancelled") && (
+                      <div className="flex-1 flex items-center justify-center gap-2 bg-gray-200 text-gray-600 py-3.5 rounded-xl font-medium cursor-not-allowed min-w-[180px] border border-gray-300">
+                        <InformationCircleIcon className="h-5 w-5" />
+                        {statusAction === "completed"
+                          ? "Completed"
+                          : statusAction === "rejected"
+                          ? "Rejected"
+                          : "Cancelled"}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
