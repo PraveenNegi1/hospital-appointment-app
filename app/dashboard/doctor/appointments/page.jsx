@@ -365,7 +365,7 @@ export default function DoctorAppointmentsDashboard() {
                         </button>
                         <button
                           onClick={() => updateStatus(appt.id, "rejected")}
-                          className="flex-1 flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98] min-w-[140px]"
+                          className="flex-1 flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98] min-w-35"
                         >
                           <XCircleIcon className="h-5 w-5" />
                           Reject
