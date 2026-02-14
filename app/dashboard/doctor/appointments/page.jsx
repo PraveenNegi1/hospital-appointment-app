@@ -358,7 +358,7 @@ export default function DoctorAppointmentsDashboard() {
                       <>
                         <button
                           onClick={() => updateStatus(appt.id, "confirmed", true)}
-                          className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98] min-w-[140px]"
+                          className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98] min-w-35"
                         >
                           <CheckCircleIcon className="h-5 w-5" />
                           Confirm
