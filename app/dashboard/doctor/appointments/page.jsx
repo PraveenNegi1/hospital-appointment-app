@@ -374,7 +374,7 @@ export default function DoctorAppointmentsDashboard() {
                     {statusAction === "confirmed" && (
                       <button
                         onClick={() => updateStatus(appt.id, "completed", true)}
-                        className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98] min-w-[180px]"
+                        className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-medium transition shadow-sm hover:shadow active:scale-[0.98] min-w-45"
                       >
                         <CheckBadgeIcon className="h-5 w-5" />
                         Mark as Completed
@@ -384,7 +384,7 @@ export default function DoctorAppointmentsDashboard() {
                     {(statusAction === "completed" ||
                       statusAction === "rejected" ||
                       statusAction === "cancelled") && (
-                      <div className="flex-1 flex items-center justify-center gap-2 bg-gray-200 text-gray-600 py-3.5 rounded-xl font-medium cursor-not-allowed min-w-[180px] border border-gray-300">
+                      <div className="flex-1 flex items-center justify-center gap-2 bg-gray-200 text-gray-600 py-3.5 rounded-xl font-medium cursor-not-allowed min-w-45 border border-gray-300">
                         <InformationCircleIcon className="h-5 w-5" />
                         {statusAction === "completed"
                           ? "Completed"
