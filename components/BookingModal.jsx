@@ -101,7 +101,7 @@ export default function BookingModal({ doctor, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center  p-4 overflow-y-auto">
       <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full h-[97vh] my-8 sm:mx-4">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-2xl p-6 text-white relative">
+        <div className="bg-linear-to-r from-indigo-600 to-purple-600 rounded-t-2xl p-6 text-white relative">
           <button
             onClick={onClose}
             disabled={loading}

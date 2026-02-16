@@ -5,7 +5,7 @@ export default function DoctorProfileCard({ doctor }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-8 text-white">
+      <div className="bg-linear-to-r from-indigo-500 to-purple-600 p-8 text-white">
         <h2 className="text-2xl md:text-3xl font-bold">
           Dr. {doctor.fullName?.split(" ").pop() || "Doctor"}
         </h2>
