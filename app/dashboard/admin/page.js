@@ -222,7 +222,6 @@ export default function AdminDashboard() {
   return (
     <ProtectedRoute allowedRoles={["admin"]}>
       <div className="flex font-serif min-h-screen bg-linear-to-br from-gray-50 via-indigo-50 to-purple-50">
-        {/* Mobile Menu Button */}
         <button
           onClick={() => setOpen(true)}
           className="lg:hidden fixed top-4 left-4 z-50 bg-indigo-600 text-white p-3 rounded-full shadow-lg hover:bg-indigo-700 transition"
