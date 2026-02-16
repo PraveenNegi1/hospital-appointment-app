@@ -180,7 +180,7 @@ export default function Footer() {
                     href="tel:+915322500000"
                     className="hover:text-white transition-colors block"
                   >
-                    +91 532 250 0000 (General)
+                    +91 9758354290
                   </a>
                 </div>
               </li>
