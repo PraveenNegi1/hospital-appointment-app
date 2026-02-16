@@ -335,7 +335,6 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Line Chart - User Growth */}
               <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">
                   User Signup Growth (Last 6 Months)
