@@ -221,7 +221,7 @@ export default function AdminDashboard() {
 
   return (
     <ProtectedRoute allowedRoles={["admin"]}>
-      <div className="flex font-serif min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50">
+      <div className="flex font-serif min-h-screen bg-linear-to-br from-gray-50 via-indigo-50 to-purple-50">
         {/* Mobile Menu Button */}
         <button
           onClick={() => setOpen(true)}
@@ -236,7 +236,7 @@ export default function AdminDashboard() {
           ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
         >
           <div className="flex items-center justify-between px-6 py-6 border-b border-indigo-100">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <h2 className="text-2xl font-bold bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               Admin Panel
             </h2>
             <button
@@ -315,7 +315,6 @@ export default function AdminDashboard() {
             )}
           </div>
 
-          {/* Charts Section */}
           {!loading && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Bar Chart - Doctor Status */}
@@ -384,7 +383,7 @@ function StatCard({ title, value, color, icon: Icon }) {
   return (
     <div className="group relative bg-white rounded-3xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden">
       <div
-        className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 bg-gradient-to-br ${
+        className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 bg-linear-to-br ${
           colorMap[color].split(" ")[0]
         }`}
       />
