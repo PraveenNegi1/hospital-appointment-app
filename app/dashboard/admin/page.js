@@ -229,7 +229,6 @@ export default function AdminDashboard() {
           <Menu size={24} />
         </button>
 
-        {/* Sidebar */}
         <aside
           className={`fixed lg:static inset-y-0 left-0 w-72 bg-white/95 backdrop-blur-lg shadow-2xl z-40 transform transition-transform duration-300 border-r border-indigo-100
           ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
