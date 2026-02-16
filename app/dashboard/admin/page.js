@@ -262,7 +262,6 @@ export default function AdminDashboard() {
           </nav>
         </aside>
 
-        {/* Main Content */}
         <main className="flex-1 p-6 lg:p-10">
           <div className="mb-12">
             <h1 className="text-3xl font-serif  font-extrabold text-transparent bg-clip-text bg-indigo-600">
@@ -273,7 +272,6 @@ export default function AdminDashboard() {
             </p>
           </div>
 
-          {/* Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-12">
             {loading ? (
               <div className="col-span-full flex justify-center py-10">
