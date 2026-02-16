@@ -367,7 +367,6 @@ export default function AdminDashboard() {
   );
 }
 
-/* Reusable Stat Card */
 function StatCard({ title, value, color, icon: Icon }) {
   const colorMap = {
     indigo: "from-indigo-500 to-indigo-600 text-indigo-600",
