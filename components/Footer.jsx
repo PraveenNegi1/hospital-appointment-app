@@ -166,7 +166,7 @@ export default function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin
                   size={18}
-                  className="text-gray-400 mt-1 flex-shrink-0"
+                  className="text-gray-400 mt-1 shrink-0"
                 />
                 <span>
                   123 Health Avenue, Civil Lines, Prayagraj, Uttar Pradesh
@@ -174,7 +174,7 @@ export default function Footer() {
                 </span>
               </li>
               <li className="flex items-center gap-3">
-                <Phone size={18} className="text-gray-400 flex-shrink-0" />
+                <Phone size={18} className="text-gray-400 shrink-0" />
                 <div className="space-y-1">
                   <a
                     href="tel:+915322500000"
@@ -185,7 +185,7 @@ export default function Footer() {
                 </div>
               </li>
               <li className="flex items-center gap-3">
-                <Mail size={18} className="text-gray-400 flex-shrink-0" />
+                <Mail size={18} className="text-gray-400 shrink-0" />
                 <a
                   href="mailto:info@medicarehospital.in"
                   className="hover:text-white transition-colors"
@@ -194,7 +194,7 @@ export default function Footer() {
                 </a>
               </li>
               <li className="flex items-start gap-3">
-                <Clock size={18} className="text-gray-400 mt-1 flex-shrink-0" />
+                <Clock size={18} className="text-gray-400 mt-1 shrink-0" />
                 <span>
                   OPD Hours: 9:00 AM – 8:00 PM
                   <br />

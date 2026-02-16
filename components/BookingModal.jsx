@@ -304,7 +304,7 @@ export default function BookingModal({ doctor, onClose }) {
                 !patientGender ||
                 !reason.trim()
               }
-              className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-5 rounded-2xl shadow-lg transition flex items-center justify-center gap-3 text-lg"
+              className="flex-1 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-5 rounded-2xl shadow-lg transition flex items-center justify-center gap-3 text-lg"
             >
               {loading ? (
                 <>
