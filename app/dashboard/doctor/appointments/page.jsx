@@ -200,7 +200,6 @@ export default function DoctorAppointmentsDashboard() {
     }
   };
 
-  // ─────────────── Render ───────────────
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
@@ -352,7 +351,6 @@ export default function DoctorAppointmentsDashboard() {
                     </div>
                   </div>
 
-                  {/* Action Buttons - shown conditionally based on status */}
                   <div className="border-t bg-gray-50/70 px-6 py-5 flex flex-wrap gap-4">
                     {statusAction === "pending" && (
                       <>
