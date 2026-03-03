@@ -127,7 +127,6 @@ export default function AdminDashboard() {
           rejectedDoctors: rejectedSnap.size,
         });
 
-        // User signup growth (last 6 months)
         const sixMonthsAgo = new Date();
         sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
