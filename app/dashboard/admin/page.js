@@ -145,7 +145,6 @@ export default function AdminDashboard() {
           }
         });
 
-        // Fill last 6 months even if no signups
         for (let i = 0; i < 7; i++) {
           const date = new Date();
           date.setMonth(date.getMonth() - i);
