@@ -80,7 +80,6 @@ export default function AdminDashboard() {
     },
   ];
 
-  // Get logged-in admin name
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
