@@ -98,7 +98,6 @@ export default function AdminDashboard() {
         const usersSnap = await getDocs(collection(db, "users"));
         const totalUsers = usersSnap.size;
 
-        // Total doctors (role == "doctor")
         const doctorsQuery = query(
           collection(db, "users"),
           where("role", "==", "doctor")
