@@ -91,7 +91,6 @@ export default function AdminDashboard() {
     return () => unsubscribe();
   }, []);
 
-  // Fetch all stats + user growth data
   useEffect(() => {
     const fetchStats = async () => {
       try {
