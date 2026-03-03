@@ -104,7 +104,6 @@ export default function AdminDashboard() {
         const doctorsSnap = await getDocs(doctorsQuery);
         const totalDoctors = doctorsSnap.size;
 
-        // Doctor statuses
         const doctorsRef = collection(db, "doctors");
         const pendingSnap = await getDocs(
           query(doctorsRef, where("status", "==", "pending"))
