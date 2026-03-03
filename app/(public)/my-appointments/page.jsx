@@ -130,11 +130,11 @@ export default function MyAppointmentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 py-8 px-4 sm:px-6 lg:px-8 font-sarif">
+    <div className="min-h-screen bg-gray-50/50 py-8 px-4 sm:px-6 lg:px-8 font-serif">
       <div className="max-w-5xl mx-auto ">
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-10 font-sarif">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-10 font-serif">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">My Appointments</h1>
             <p className="mt-2 text-gray-600">
