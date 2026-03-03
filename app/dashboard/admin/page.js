@@ -173,7 +173,6 @@ export default function AdminDashboard() {
     fetchStats();
   }, []);
 
-  // Bar Chart Data
   const barChartData = {
     labels: ["Pending", "Approved", "Rejected"],
     datasets: [
