@@ -94,7 +94,6 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Total users
         const usersSnap = await getDocs(collection(db, "users"));
         const totalUsers = usersSnap.size;
 
