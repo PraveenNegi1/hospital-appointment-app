@@ -14,7 +14,7 @@ export default function EditDoctorProfile() {
   const [clinicName, setClinicName] = useState("");
   const [clinicAddress, setClinicAddress] = useState("");
   const [consultationFee, setConsultationFee] = useState("");
-  const [availability, setAvailability] = useState(""); // e.g. "Mon-Fri 10AM-4PM"
+  const [availability, setAvailability] = useState(""); 
   const [bio, setBio] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
