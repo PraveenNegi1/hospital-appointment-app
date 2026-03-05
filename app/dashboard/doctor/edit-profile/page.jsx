@@ -87,7 +87,6 @@ export default function EditDoctorProfile() {
 
       setSuccess(true);
 
-      // Redirect to main doctor dashboard after 1.5 seconds
       setTimeout(() => {
         router.push("/dashboard/doctor");
       }, 1500);
