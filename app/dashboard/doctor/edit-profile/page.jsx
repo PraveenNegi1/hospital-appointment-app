@@ -264,7 +264,6 @@ export default function EditDoctorProfile() {
             />
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
