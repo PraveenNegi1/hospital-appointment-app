@@ -22,7 +22,6 @@ export default function EditDoctorProfile() {
 
   const router = useRouter();
 
-  // Fetch existing profile data
   useEffect(() => {
     const fetchProfile = async () => {
       const user = auth.currentUser;
