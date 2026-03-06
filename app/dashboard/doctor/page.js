@@ -139,7 +139,6 @@ export default function DoctorDashboard() {
               Welcome, Dr. {doctorData?.fullName?.split(" ").pop() || "Doctor"}
             </h1>
 
-            {/* Approval Request / Re-request Button */}
             {(isPending || isRejected) && (
               <button
                 onClick={handleRequestApproval}
