@@ -184,7 +184,6 @@ export default function DoctorDashboard() {
             )}
           </div>
 
-          {/* Status Banner */}
           <div
             className={`mb-8 p-5 rounded-xl border shadow-sm ${
               isApproved
