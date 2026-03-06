@@ -129,7 +129,6 @@ export default function DoctorDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex font-serif">
-      {/* Sidebar */}
       <DoctorSidebar />
 
       {/* Main content */}
