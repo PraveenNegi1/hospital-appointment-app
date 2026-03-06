@@ -80,7 +80,7 @@ export default function DoctorDashboard() {
         status: "pending-review",
         approvalRequestedAt: new Date().toISOString(),
         approvalRequestedBy: user.uid,
-        rejectionReason: "", // clear previous rejection reason if any
+        rejectionReason: "", 
       });
 
       setRequestSuccess(true);
