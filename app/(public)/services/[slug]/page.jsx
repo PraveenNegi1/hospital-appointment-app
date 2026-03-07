@@ -46,7 +46,7 @@ export default function ServiceDoctorsPage() {
     const q = query(
       collection(db, "doctors"),
       where("status", "==", "approved"),
-      where("specialty", "==", slug.toLowerCase()),
+      where("specialty", "==", slug),
     );
 
     const unsub = onSnapshot(q, (snapshot) => {

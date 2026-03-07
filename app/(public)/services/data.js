@@ -241,7 +241,7 @@ export const servicesData = [
   },
 
   {
-    slug: "obstetrics-gynecology",
+    slug: "Gynecology-Obstetrics",
     title: "Obstetrics & Gynecology",
     shortDesc: "Complete care for women's health, pregnancy, and childbirth.",
     icon: Stethoscope,
