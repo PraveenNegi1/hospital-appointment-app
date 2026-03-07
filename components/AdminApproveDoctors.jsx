@@ -53,7 +53,6 @@ export default function AdminApproveDoctors() {
         // Optional: approvedBy: auth.currentUser.uid
       });
 
-      // Remove from pending list
       setPendingDoctors((prev) => prev.filter((d) => d.id !== id));
       alert("Doctor approved successfully!");
     } catch (err) {
