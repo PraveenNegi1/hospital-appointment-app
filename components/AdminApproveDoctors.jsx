@@ -65,7 +65,7 @@ export default function AdminApproveDoctors() {
 
   const handleReject = async (id) => {
     const reason = prompt("Enter rejection reason (optional):");
-    if (reason === null) return; // user canceled
+    if (reason === null) return; 
 
     setActionLoading((prev) => ({ ...prev, [id]: true }));
 
