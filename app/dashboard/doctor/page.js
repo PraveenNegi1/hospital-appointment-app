@@ -187,6 +187,7 @@ export default function DoctorDashboard() {
           <div
             className={`mb-8 p-5 rounded-xl border shadow-sm ${
               isApproved
+              
                 ? "bg-green-50 border-green-200 text-green-800"
                 : isRejected
                   ? "bg-red-50 border-red-200 text-red-800"

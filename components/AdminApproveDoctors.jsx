@@ -78,7 +78,6 @@ export default function AdminApproveDoctors() {
         rejectionReason: reason.trim() || "No reason provided",
       });
 
-      // Remove from pending list
       setPendingDoctors((prev) => prev.filter((d) => d.id !== id));
       alert("Doctor rejected.");
     } catch (err) {
