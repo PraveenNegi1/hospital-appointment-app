@@ -100,7 +100,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3 - Our Services (key departments) */}
           <div>
             <h4 className="text-white text-lg font-semibold mb-6">
               Key Departments
