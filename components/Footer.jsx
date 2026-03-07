@@ -209,7 +209,6 @@ export default function Footer() {
       <div className="border-t border-gray-800 bg-gray-950/80">
         <div className="max-w-7xl mx-auto px-6 md:px-10 lg:px-12 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-gray-500">
-            {/* Left - Copyright & Legal */}
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8">
               <p>© {currentYear} MediCare Hospital. All rights reserved.</p>
               <div className="flex flex-wrap gap-5 sm:gap-6">
