@@ -157,7 +157,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 4 - Contact & Hours */}
           <div>
             <h4 className="text-white text-lg font-semibold mb-6">
               Contact Information
